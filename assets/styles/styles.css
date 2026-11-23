@@ -202,6 +202,24 @@ ul {
     font-family:'Segoe UI';
 }
 
+body,
+button,
+input,
+select,
+textarea {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+header,
+nav,
+nav ul,
+nav li,
+nav a,
+.back-link,
+.back-text {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
 ul {
     padding-left: 20px;
 }
@@ -2023,6 +2041,7 @@ pre code {
         display: block;
         text-align: center;
         border-bottom: 1px solid rgba(47, 223, 173, 0.1);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     }
 
     nav a::after {
