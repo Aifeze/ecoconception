@@ -12,7 +12,7 @@
     const results = byId('results');
     const drafts = new Map();
     const format = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
-    let currentKey;
+    let currentSelection;
 
     function addOptions(select, entries) {
         select.replaceChildren(...entries.map(([value, label]) => new Option(label, value)));
@@ -28,14 +28,15 @@
     }
 
     function showExercise() {
-        if (currentKey) drafts.set(currentKey, answer.value);
+        if (currentSelection) drafts.set(currentSelection.draftKey, answer.value);
 
         const languageKey = languageSelect.value;
         const exerciseKey = exerciseSelect.value;
         const language = languages[languageKey];
         const exercise = exercises[exerciseKey];
-        currentKey = `${languageKey}/${exerciseKey}`;
-        answer.value = drafts.get(currentKey) ?? '';
+        const draftKey = `${languageKey}/${exerciseKey}`;
+        currentSelection = { languageKey, exerciseKey, draftKey };
+        answer.value = drafts.get(draftKey) ?? '';
         resetResults();
         form.querySelector('details').open = false;
         byId('exercise-title').textContent = exercise.title;
@@ -58,6 +59,11 @@
         byId('syntax').textContent = `${syntax[exerciseKey]} Saisissez l’expression seule, sans fonction ni point-virgule.`;
     }
 
+    function restoreDisplayedSelection() {
+        languageSelect.value = currentSelection.languageKey;
+        exerciseSelect.value = currentSelection.exerciseKey;
+    }
+
     function describeInputs(inputs) {
         return Object.entries(inputs).map(([name, value]) => {
             if (!Array.isArray(value)) return `${name} = ${value}`;
@@ -76,14 +82,16 @@
 
     form.addEventListener('submit', event => {
         event.preventDefault();
+        // A browser can restore select values without dispatching a change event.
+        restoreDisplayedSelection();
         resetResults();
-        const language = languageSelect.value;
-        const exercise = exercises[exerciseSelect.value];
+        const { languageKey, exerciseKey } = currentSelection;
+        const exercise = exercises[exerciseKey];
 
         try {
-            const expression = parseExpression(answer.value, language, exercise.inputs, exercise.resultType);
-            for (const inputs of exercise.cases) assertCorrect(expression, exercise, language, inputs);
-            const { expected, actual } = assertCorrect(expression, exercise, language, exercise.benchmark);
+            const expression = parseExpression(answer.value, languageKey, exercise.inputs, exercise.resultType);
+            for (const inputs of exercise.cases) assertCorrect(expression, exercise, languageKey, inputs);
+            const { expected, actual } = assertCorrect(expression, exercise, languageKey, exercise.benchmark);
             if (actual.operations >= expected.operations && !expected.memory) {
                 feedback.textContent = 'Les résultats sont corrects. Essayez de réduire le nombre d’opérations sur le cas de comparaison.';
                 return;
@@ -100,7 +108,7 @@
             feedback.dataset.success = 'true';
             feedback.textContent = `Optimisation validée sur ${exercise.cases.length + 1} jeux de données. La comparaison est affichée sous l’éditeur.`;
         } catch (error) {
-            feedback.textContent = error.message;
+            feedback.textContent = `${languages[languageKey].name} — ${error.message}`;
         }
     });
 
@@ -108,6 +116,7 @@
     exerciseSelect.addEventListener('change', showExercise);
     answer.addEventListener('input', resetResults);
     showExercise();
+    window.addEventListener('pageshow', restoreDisplayedSelection);
     byId('atelier-controls').disabled = false;
     byId('atelier-status').hidden = true;
 })();
