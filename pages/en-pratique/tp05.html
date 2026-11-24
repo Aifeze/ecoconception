@@ -6,8 +6,7 @@
     <meta name="description" content="Trois exercices d’optimisation à résoudre dans chacun des sept langages du site.">
     <title>TP 05 — Optimiser du code | Écoconception numérique</title>
     <link rel="icon" href="../../assets/img/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="../../assets/styles/styles.css">
-    <link rel="stylesheet" href="../../assets/styles/tp05.css?v=2">
+    <link rel="stylesheet" href="../../assets/styles/styles.css?v=tp05">
     <script defer src="../../assets/scripts/hamburger.js"></script>
     <script defer src="../../assets/scripts/tp05-exercices.js?v=2"></script>
     <script defer src="../../assets/scripts/tp05-expression.js?v=2"></script>
@@ -44,21 +43,21 @@
         </section>
 
         <div class="tp-content">
-            <details class="collapsible tp05-section" open>
+            <details class="collapsible" open>
                 <summary><h2>Objectif <span class="toggle-icon" aria-hidden="true"></span></h2></summary>
                 <p>Réécrivez du code pour obtenir le même résultat avec moins de calculs ou moins de copies. Vous vérifierez chaque optimisation en comparant le travail effectué sur les mêmes données.</p>
             </details>
 
-            <details class="collapsible tp05-section">
+            <details class="collapsible">
                 <summary><h2>Prérequis et ressources <span class="toggle-icon" aria-hidden="true"></span></h2></summary>
-                <div class="tp05-section-body">
+                <div class="content">
                     <p>Il suffit de connaître les variables, opérateurs et tableaux d’un des <a href="../langages.html">langages du site</a>. Le correcteur fonctionne dans le navigateur.</p>
                 </div>
             </details>
 
-            <details class="collapsible practical-section tp05-section" open>
+            <details class="collapsible practical-section" open>
                 <summary><h2>Exercices pratiques <span class="toggle-icon" aria-hidden="true"></span></h2></summary>
-                <div class="tp05-section-body">
+                <div class="content">
                     <ol>
                         <li>Choisissez un langage et un exercice.</li>
                         <li>Repérez le travail inutile dans le code de départ.</li>
@@ -86,7 +85,7 @@
                             </div>
 
                             <div class="tp05-workspace">
-                                <div class="tp05-panel">
+                                <div class="info-block">
                                     <h4>Code de départ</h4>
                                     <pre tabindex="0" aria-label="Code de départ"><code id="baseline">function somme(n) {
     let total = 0;
@@ -95,7 +94,7 @@
 }</code></pre>
                                     <p id="baseline-note">La boucle additionne un nombre à chaque tour, même lorsqu’un calcul direct suffit.</p>
                                 </div>
-                                <div class="tp05-panel">
+                                <div class="info-block">
                                     <h4>Votre optimisation</h4>
                                     <label for="answer">Expression à renvoyer</label>
                                     <textarea id="answer" name="answer" rows="5" maxlength="240" required
@@ -113,8 +112,8 @@
 
                         </fieldset>
 
-                        <div class="tp05-feedback" id="feedback" role="status" aria-atomic="true"></div>
-                        <section class="tp05-panel tp05-results" id="results" aria-labelledby="compare-title" hidden>
+                        <div class="tp-note tp05-feedback" id="feedback" role="status" aria-atomic="true"></div>
+                        <section class="info-block tp05-results" id="results" aria-labelledby="compare-title" hidden>
                             <h3 id="compare-title">Comparaison avant et après</h3>
                             <p id="benchmark"></p>
                             <table>
@@ -130,9 +129,9 @@
                 </div>
             </details>
 
-            <details class="collapsible practical-section tp05-section">
+            <details class="collapsible practical-section">
                 <summary><h2>Conclusion : interpréter les résultats <span class="toggle-icon" aria-hidden="true"></span></h2></summary>
-                <div class="tp05-section-body">
+                <div class="content">
                     <p>Pour chaque exercice terminé, relevez la différence avant et après, puis expliquez quel parcours, calcul ou tableau temporaire votre expression a évité.</p>
                     <p>Le correcteur évalue un sous-ensemble d’expressions du langage choisi. Il compte les opérations et les éléments temporaires sur les jeux de données de l’exercice. Un chronométrage ou une mesure de RAM demanderait une exécution native.</p>
                     <p>Le badge <a href="https://www.ecoindex.fr/">EcoIndex</a> estime l’empreinte de la page à partir de la taille du DOM, du nombre de requêtes et du poids transféré.</p>
