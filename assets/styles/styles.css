@@ -2319,6 +2319,67 @@ pre code {
     opacity: .9;
 }
 
+/* Sommaire (page responsable_impact_numerique) */
+.toc {
+    width: 100%;
+}
+.toc ol {
+    list-style: none;
+    counter-reset: toc;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap: .6rem 1.2rem;
+    text-align: left;
+}
+.toc li {
+    counter-increment: toc;
+}
+.toc a {
+    display: flex;
+    align-items: baseline;
+    gap: .7rem;
+    height: 100%;
+    padding: .6rem .9rem;
+    border: 1px solid rgba(47, 223, 173, .2);
+    border-radius: 10px;
+    font-size: 1.05rem;
+    line-height: 1.4;
+    text-decoration: none;
+    transition: background-color .2s ease;
+}
+.toc a::before {
+    content: counter(toc, decimal-leading-zero);
+    opacity: .7;
+}
+.toc a:hover,
+.toc a:focus-visible {
+    background-color: rgba(47, 223, 173, .08);
+}
+
+/* Tableau récapitulatif (page responsable_impact_numerique) */
+.recap-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: .95rem;
+    line-height: 1.5;
+}
+.recap-table caption {
+    text-align: left;
+    font-weight: bold;
+    margin-bottom: .5rem;
+}
+.recap-table th,
+.recap-table td {
+    border: 1px solid rgba(47, 223, 173, .35);
+    padding: .5rem .6rem;
+    text-align: left;
+    vertical-align: top;
+}
+.recap-table th {
+    color: var(--highlight-color);
+}
+
 /* Responsive Design */
 
 /* Tablettes (Portrait et Paysage) */
