@@ -25,6 +25,7 @@ Ce site a été développé dans le cadre de mon stage de recherche en éco-conc
   - **TP 02** : Optimisation des Ressources Web
   - **TP 03** : Détection et Réduction des Scripts Inutilisés
   - **TP 04** : Optimisation de l'Utilisation des Polices Web
+  - **TP 05** : [Optimiser du code](./pages/en-pratique/tp05.html) dans sept langages et comparer les opérations et les copies.
 - **Outils** : Présentation des outils recommandés pour l'analyse et l'optimisation écologique des services numériques.
 
 ## Technologies utilisées
