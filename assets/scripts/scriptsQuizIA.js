@@ -1,221 +1,217 @@
 /*
- * Quiz « Génération d'images par IA et écoconception ».
+ * Quiz « Génération d'images par IA » : estimation de l'impact de vos habitudes.
  *
- * Pour modifier le quiz, il suffit d'éditer le tableau `questions` :
- *   type        : "single" (choix unique), "multiple" (choix multiples) ou "truefalse"
- *   theme       : notion abordée, reprise dans le récapitulatif final
- *   question    : énoncé
- *   answers     : propositions ; `correct: true` pour les bonnes réponses,
- *                 `why` explique l'erreur de raisonnement d'une mauvaise réponse
- *   explanation : correction affichée après validation
- *   takeaway    : notion à retenir, affichée dans les résultats
+ * Pour modifier le quiz, éditer le tableau `questions` :
+ *   question : énoncé
+ *   answers  : propositions ; `recommendation` (facultatif) est reprise dans les résultats,
+ *              `value` (facultatif) sert au calcul de l'estimation
+ *   info     : encadré « Information » affiché après validation
+ *   extra    : encadré « Comparaison » (facultatif)
+ *   source   : référence (facultatif)
+ *   key      : "needs", "launches" ou "perLaunch" pour les trois questions utilisées dans le calcul
  */
+const SOURCE_LUCCIONI = "[1] A. S. Luccioni, Y. Jernite et E. Strubell, « Power Hungry Processing: Watts Driving the Cost of AI Deployment? », ACM FAccT 2024. [Online]. Available: <a href='https://arxiv.org/abs/2311.16863' target='_blank'>https://arxiv.org/abs/2311.16863</a>";
+
+// Valeurs de référence (Luccioni et al., FAccT 2024, section 4.1 et tableau 2).
+const ENERGY = {
+    imageWh: 2.907,       // moyenne pour la génération d'images : 2,907 kWh pour 1 000 images
+    imageWorstWh: 11.49,  // modèle de génération d'images le moins efficace : 11,49 kWh pour 1 000 images
+    smartphoneChargeWh: 22, // une recharge de smartphone : 0,022 kWh (US EPA 2024, cité par l'étude)
+    textRequestWh: 0.047, // génération de texte : 0,047 kWh pour 1 000 requêtes
+    ledBulbW: 10          // ampoule LED de 10 W
+};
+
 const questions = [
     {
-        type: "single",
-        theme: "Fonctionnement de la diffusion",
-        question: "Comment un modèle de diffusion, utilisé par la plupart des générateurs d'images, crée-t-il une image ?",
+        key: "needs",
+        question: "Combien de fois par semaine avez-vous besoin de générer une image avec une IA (projet, message, curiosité…) ?",
         answers: [
-            { text: "Il part d'un bruit aléatoire qu'il retire progressivement, étape par étape, en s'appuyant sur la description fournie.", correct: true },
-            { text: "Il recherche sur Internet l'image la plus proche de la description, puis la modifie légèrement.", why: "Le modèle ne consulte pas Internet pendant la génération : il s'appuie sur ce qu'il a appris lors de son entraînement, enregistré dans ses paramètres." },
-            { text: "Il assemble des morceaux d'images existantes, découpés dans ses données d'entraînement.", why: "Le modèle ne conserve pas une bibliothèque d'images à découper : il a appris des régularités statistiques et calcule de nouveaux pixels." },
-            { text: "Il dessine l'image pixel par pixel, sans jamais revenir sur ce qu'il a déjà produit.", why: "La diffusion travaille au contraire sur l'image entière à chaque étape et la retouche progressivement." }
+            { text: "Jamais ou presque", value: 0 },
+            { text: "1 à 2 fois", value: 1.5 },
+            { text: "3 à 10 fois", value: 6.5, recommendation: "Avant de générer, demandez-vous si une image existante ou une photo libre de droits ne suffirait pas." },
+            { text: "Plus de 10 fois", value: 15, recommendation: "Avant de générer, demandez-vous si une image existante ou une photo libre de droits ne suffirait pas." }
         ],
-        explanation: "La diffusion est un processus itératif : à chaque étape, un réseau de neurones estime le bruit encore présent et en retire une partie. Dans beaucoup de modèles récents, ce travail se fait sur une version compressée de l'image (l'« espace latent »), qu'un décodeur transforme ensuite en pixels. Chaque étape est un passage complet dans le réseau, donc du calcul.",
-        takeaway: "Une image générée par diffusion est obtenue en retirant progressivement du bruit, en plusieurs étapes de calcul."
+        info: "Chaque demande lance un calcul important sur un processeur graphique (GPU), qui retire progressivement le « bruit » d'une image en plusieurs étapes. Dans une étude de référence, générer une image consomme en moyenne environ 2,9 Wh.",
+        extra: "Générer 1 000 images consomme en moyenne 2,9 kWh, soit l'énergie d'environ 130 recharges de smartphone.",
+        source: SOURCE_LUCCIONI
     },
     {
-        type: "truefalse",
-        theme: "Rôle du GPU",
-        question: "Vrai ou faux : le GPU (processeur graphique) accélère la génération parce qu'il réalise en parallèle un très grand nombre de calculs simples, notamment des multiplications de matrices.",
+        key: "launches",
+        question: "Pour un même besoin, combien de fois lancez-vous la génération avant d'être satisfait(e) ?",
         answers: [
-            { text: "Vrai", correct: true },
-            { text: "Faux", why: "Le GPU ne sert pas qu'à l'affichage : son architecture massivement parallèle en fait l'outil principal des calculs d'IA." }
+            { text: "Une seule fois", value: 1 },
+            { text: "2 à 4 fois", value: 3, recommendation: "Précisez votre description (sujet, style, cadrage) avant de lancer la génération pour limiter les essais." },
+            { text: "5 à 10 fois", value: 7.5, recommendation: "Précisez votre description (sujet, style, cadrage) avant de lancer la génération pour limiter les essais." },
+            { text: "Plus de 10 fois", value: 12, recommendation: "Précisez votre description (sujet, style, cadrage) avant de lancer la génération pour limiter les essais." }
         ],
-        explanation: "Un réseau de neurones repose surtout sur des multiplications de matrices, que l'on peut découper en milliers d'opérations indépendantes. Un GPU dispose de milliers d'unités de calcul capables de les traiter simultanément, là où un processeur classique (CPU) en traite beaucoup moins à la fois. Plus rapide ne veut pas dire sans impact : sous forte charge, un GPU peut consommer de quelques dizaines à plusieurs centaines de watts, et sa fabrication a aussi une empreinte.",
-        takeaway: "Le GPU exécute en parallèle les calculs du modèle ; sa consommation dépend de sa charge et de la durée d'utilisation."
+        info: "Chaque nouvel essai refait tout le calcul : les images écartées ont consommé autant d'énergie que celle que vous gardez.",
+        extra: "Dans l'étude de référence, le modèle le moins efficace consomme environ la moitié d'une recharge de smartphone pour une seule image.",
+        source: SOURCE_LUCCIONI
     },
     {
-        type: "single",
-        theme: "Influence de la résolution",
-        question: "On passe d'une image de 512 × 512 pixels à une image de 1024 × 1024 pixels. Par combien est multiplié le nombre de pixels à produire ?",
+        key: "perLaunch",
+        question: "À chaque lancement, combien d'images votre outil produit-il ?",
         answers: [
-            { text: "Par 2", why: "Chaque côté double, mais la surface dépend des deux côtés : 2 × 2 = 4." },
-            { text: "Par 4", correct: true },
-            { text: "Par 8", why: "8 correspondrait à un doublement selon trois dimensions ; une image n'en a que deux." },
-            { text: "Il ne change pas : seule la netteté de l'image change.", why: "Une résolution plus élevée, c'est réellement plus de pixels, donc plus de données à calculer et à garder en mémoire." }
+            { text: "Une seule", value: 1 },
+            { text: "Deux", value: 2 },
+            { text: "Quatre ou plus", value: 4, recommendation: "Si l'outil le permet, ne produisez qu'une image par lancement tant que vous explorez une idée." },
+            { text: "Je ne sais pas", value: 1, recommendation: "Vérifiez combien d'images votre outil produit à chaque demande : certains en génèrent plusieurs par défaut." }
         ],
-        explanation: "512 × 512 = 262 144 pixels et 1024 × 1024 = 1 048 576 pixels, soit quatre fois plus. Le coût de calcul suit au moins cette hausse et peut augmenter davantage, car certains mécanismes des modèles (l'« attention ») comparent chaque zone de l'image à toutes les autres. La mémoire nécessaire sur le GPU augmente elle aussi.",
-        takeaway: "Doubler la largeur et la hauteur multiplie par quatre le nombre de pixels, et au moins d'autant les calculs."
+        info: "Certains services proposent plusieurs images à chaque demande. Chacune représente un calcul complet, même si vous n'en conservez qu'une.",
+        extra: "",
+        source: ""
     },
     {
-        type: "truefalse",
-        theme: "Influence du nombre d'étapes",
-        question: "Vrai ou faux : doubler le nombre d'étapes de génération double la qualité de l'image.",
+        question: "En quelle taille générez-vous habituellement vos images ?",
         answers: [
-            { text: "Vrai", why: "La qualité n'évolue pas proportionnellement au nombre d'étapes : c'est le temps de calcul qui suit à peu près cette proportion." },
-            { text: "Faux", correct: true }
+            { text: "Une taille adaptée à l'usage (vignette, publication, diaporama…)" },
+            { text: "La taille proposée par défaut, sans y penser", recommendation: "Choisissez la taille de l'image selon son affichage réel plutôt que la taille par défaut." },
+            { text: "Toujours la plus grande taille possible, voire avec un agrandissement", recommendation: "Évitez de générer ou d'agrandir en très haute résolution une image qui sera affichée en petit." },
+            { text: "Je ne sais pas", recommendation: "Regardez la taille des images que vous générez et adaptez-la à leur affichage réel." }
         ],
-        explanation: "Chaque étape étant un nouveau passage dans le réseau, le temps de calcul augmente à peu près proportionnellement au nombre d'étapes. La qualité, elle, progresse vite au début puis plafonne : au-delà d'un seuil propre à chaque modèle et à chaque méthode d'échantillonnage, les étapes supplémentaires changent peu le résultat visible tout en coûtant autant de calcul.",
-        takeaway: "Plus d'étapes signifie plus de calcul, mais pas une qualité proportionnellement meilleure."
+        info: "Doubler la largeur et la hauteur d'une image multiplie par quatre le nombre de pixels à calculer. L'étude de référence observe de grands écarts de consommation entre modèles, liés notamment à la taille des images produites.",
+        extra: "Une image de 512 × 512 pixels compte 262 144 pixels, une image de 1024 × 1024 pixels en compte 1 048 576.",
+        source: SOURCE_LUCCIONI
     },
     {
-        type: "multiple",
-        theme: "Génération standard et optimisée",
-        question: "Une génération « standard » utilise 1024 × 1024 pixels et 30 étapes. Une génération « optimisée » utilise 512 × 512 pixels et 15 étapes, avec le même modèle. Quelles affirmations sont exactes ?",
+        question: "Avant de lancer une génération, comment rédigez-vous votre description ?",
         answers: [
-            { text: "Chaque étape porte sur quatre fois moins de pixels.", correct: true },
-            { text: "Le modèle effectue deux fois moins de passages.", correct: true },
-            { text: "L'image est moins détaillée, mais peut suffire pour une vignette, un brouillon ou une illustration affichée en petit.", correct: true },
-            { text: "L'image obtenue est identique, simplement plus petite.", why: "Moins de pixels et moins d'étapes changent le résultat : détails, textures et parfois composition peuvent différer." },
-            { text: "Le calcul est forcément divisé par exactement 8.", why: "On peut raisonner un ordre de grandeur (4 fois moins de pixels, 2 fois moins d'étapes), mais le gain réel dépend du modèle, du matériel et des opérations fixes comme le chargement du modèle ou le décodage de l'image. Il doit être mesuré." }
+            { text: "Je la prépare précisément (sujet, style, cadrage, couleurs)" },
+            { text: "J'écris quelques mots puis je corrige au fil des essais", recommendation: "Prenez une minute pour rédiger une description complète avant le premier lancement." },
+            { text: "Je teste au hasard pour voir ce qui sort", recommendation: "Prenez une minute pour rédiger une description complète avant le premier lancement." }
         ],
-        explanation: "Les deux leviers se combinent : moins de pixels à chaque étape et moins d'étapes. Le gain est important, mais il se paie en détails. Le bon réglage dépend de l'usage : inutile de générer en 1024 × 1024 une image qui sera affichée sur 300 pixels de large.",
-        takeaway: "Réduire résolution et étapes diminue fortement les calculs, au prix de détails : le réglage doit suivre le besoin réel."
+        info: "Une description précise réduit les essais inutiles. Certains outils permettent aussi de modifier une zone d'une image existante plutôt que de tout régénérer.",
+        extra: "",
+        source: ""
     },
     {
-        type: "single",
-        theme: "Modèles accélérés",
-        question: "Certains modèles dits « accélérés » ou « distillés » produisent une image en 1 à 8 étapes. Pourquoi ne peut-on pas régler n'importe quel modèle sur 5 étapes ?",
+        question: "Quand vous avez besoin d'une image proche d'une image déjà générée, que faites-vous ?",
         answers: [
-            { text: "Parce que ces modèles ont été spécialement entraînés pour aboutir en peu d'étapes ; un modèle classique réglé sur 5 étapes donne souvent une image floue ou inachevée.", correct: true },
-            { text: "Parce qu'un faible nombre d'étapes demande davantage de mémoire sur le GPU.", why: "La mémoire nécessaire dépend surtout de la taille du modèle et de la résolution, pas du nombre d'étapes." },
-            { text: "Parce qu'en dessous de 10 étapes, seule la résolution 1024 × 1024 est possible.", why: "Le nombre d'étapes et la résolution sont deux réglages indépendants." },
-            { text: "On le peut : tous les modèles donnent le même résultat en 5 étapes qu'en 30.", why: "C'est faux pour les modèles classiques : ils ont besoin de davantage d'étapes pour retirer correctement le bruit." }
+            { text: "Je réutilise ou je retouche l'image existante" },
+            { text: "Je génère une nouvelle image", recommendation: "Réutilisez ou retouchez les images déjà générées quand elles répondent au besoin." },
+            { text: "Je ne retrouve jamais mes anciennes images", recommendation: "Classez les images que vous conservez pour pouvoir les retrouver et les réutiliser." }
         ],
-        explanation: "La distillation consiste à entraîner un modèle « élève » à reproduire en quelques étapes ce qu'un modèle « maître » obtient en plusieurs dizaines. Le gain de temps est réel, mais il peut s'accompagner de compromis selon les modèles : moins de diversité, moins de fidélité à la consigne ou des détails moins fins. L'entraînement de ces modèles a lui-même un coût, amorti seulement s'ils sont beaucoup utilisés.",
-        takeaway: "Générer en très peu d'étapes exige un modèle conçu pour cela, avec des compromis possibles sur le résultat."
+        info: "Réutiliser une image existante évite tout le calcul d'une nouvelle génération : il ne reste que le coût de son stockage et de son affichage.",
+        extra: "",
+        source: ""
     },
     {
-        type: "multiple",
-        theme: "Utilisation répétée",
-        question: "Une personne génère 20 variantes d'une même idée pour n'en garder qu'une. Quelles affirmations sont exactes ?",
+        question: "Pour quoi utilisez-vous le plus souvent la génération d'images ?",
         answers: [
-            { text: "L'énergie consommée correspond aux 20 générations, pas seulement à l'image retenue.", correct: true },
-            { text: "Seule l'image conservée a un coût énergétique, puisque les autres sont effacées.", why: "Effacer une image n'annule pas le calcul déjà effectué : l'énergie a été consommée au moment de la génération." },
-            { text: "Préciser sa demande avant de générer peut réduire le nombre d'essais nécessaires.", correct: true },
-            { text: "Explorer d'abord en basse résolution, puis générer une seule version finale en haute résolution, peut limiter les calculs.", correct: true },
-            { text: "À l'échelle d'un service en ligne, cet usage reste négligeable car chaque image est rapide à produire.", why: "Un coût unitaire faible, multiplié par des millions de requêtes chaque jour, devient important : c'est l'effet de volume." }
+            { text: "Un besoin précis (illustrer un travail, une présentation…)" },
+            { text: "Le divertissement ou la curiosité", recommendation: "Gardez en tête que chaque image « pour voir » mobilise un GPU : générez avec modération." },
+            { text: "Des images que je pourrais trouver dans une banque d'images libre de droits", recommendation: "Pour des images courantes, consultez d'abord une banque d'images libre de droits." }
         ],
-        explanation: "Chaque génération mobilise le matériel pendant toute sa durée et les coûts s'additionnent : 20 essais représentent environ 20 fois le calcul d'une image. À l'échelle d'une plateforme utilisée par des millions de personnes, la répétition des requêtes est l'un des principaux facteurs d'impact.",
-        takeaway: "Chaque essai a un coût : mieux préparer sa demande évite des générations inutiles."
+        info: "Pour une image courante (paysage, objet, photo d'illustration), une banque d'images libre de droits peut suffire et évite une génération.",
+        extra: "Dans l'étude de référence, générer une image consomme en moyenne plus de 60 fois plus d'énergie qu'une requête de génération de texte.",
+        source: SOURCE_LUCCIONI
     },
     {
-        type: "truefalse",
-        theme: "Réutilisation d'images",
-        question: "Vrai ou faux : lorsqu'une image déjà générée répond au besoin, la réutiliser plutôt que d'en générer une nouvelle évite tout le calcul d'une nouvelle génération.",
+        question: "Quel type d'outil utilisez-vous principalement ?",
         answers: [
-            { text: "Vrai", correct: true },
-            { text: "Faux", why: "Une nouvelle génération recalcule toutes les étapes ; réutiliser une image existante n'en refait aucune." }
+            { text: "Un service en ligne (site ou application)" },
+            { text: "Un logiciel installé sur mon ordinateur" },
+            { text: "Les deux" },
+            { text: "Je ne sais pas" }
         ],
-        explanation: "Réafficher une image existante demande seulement de la lire et de la transmettre. Ces opérations ont aussi un coût (stockage, réseau, affichage), mais elles ne sollicitent ni le modèle ni le GPU pour recalculer l'image. Conserver et organiser les images utiles, par exemple dans une banque d'images interne, est donc une bonne pratique.",
-        takeaway: "Réutiliser une image pertinente évite une nouvelle génération ; seul son stockage et sa diffusion restent à prendre en compte."
+        info: "Avec un service en ligne, le calcul est réalisé dans un centre de données : sa consommation, son refroidissement et le réseau restent invisibles pour vous. En local, c'est votre propre carte graphique ou processeur qui travaille. Dans les deux cas, la consommation dépend fortement du matériel et du modèle utilisés.",
+        extra: "D'après l'étude, 1 000 images générées par le modèle le plus émetteur testé (Stable Diffusion XL) émettent environ 1,6 kg de CO₂e, l'équivalent d'environ 6,6 km parcourus en voiture essence. Ce chiffre dépend du mix électrique du centre de données.",
+        source: SOURCE_LUCCIONI
     },
     {
-        type: "multiple",
-        theme: "Limites des estimations",
-        question: "Pourquoi faut-il rester prudent face à un chiffre annonçant « l'énergie consommée par une image générée » ?",
+        question: "Que faites-vous des images que vous ne gardez pas ?",
         answers: [
-            { text: "Le résultat dépend fortement du matériel utilisé (GPU, ordinateur, serveur) et de son efficacité.", correct: true },
-            { text: "Une lecture instantanée de la puissance ne suffit pas : il faut la mesurer sur toute la durée de la génération.", correct: true },
-            { text: "Selon la méthode, le chiffre inclut ou non le chargement du modèle, le refroidissement, le réseau ou la fabrication du matériel.", correct: true },
-            { text: "Le nombre d'étapes suffit à calculer précisément l'énergie consommée.", why: "Les étapes donnent une tendance, pas une valeur : à nombre d'étapes égal, le modèle, la résolution et le matériel changent fortement le résultat." },
-            { text: "La consommation est la même quel que soit l'ordinateur utilisé.", why: "Deux machines peuvent présenter des écarts importants de durée et de puissance pour une même génération." }
+            { text: "Je les supprime au fur et à mesure" },
+            { text: "Elles restent stockées dans mon historique en ligne", recommendation: "Faites régulièrement le tri dans votre historique : ne conservez que les images utiles." },
+            { text: "Je les télécharge toutes, au cas où", recommendation: "Ne téléchargez que les images que vous comptez réellement utiliser." }
         ],
-        explanation: "L'énergie se calcule ainsi : Énergie (Wh) = Puissance moyenne (W) × Durée (h). Par exemple, une puissance moyenne de 100 W pendant 36 secondes (0,01 h) correspond à 1 Wh. Sans connaître le matériel, la durée réelle et le périmètre pris en compte, un chiffre isolé reste une estimation : une mesure fiable précise toujours ses conditions.",
-        takeaway: "Une consommation énergétique se mesure (puissance moyenne × durée) et n'a de sens qu'avec ses conditions de mesure."
+        info: "L'énergie de la génération est déjà consommée, mais conserver des milliers d'images inutiles occupe des serveurs ou des disques dans la durée.",
+        extra: "",
+        source: ""
     },
     {
-        type: "single",
-        theme: "Bonnes pratiques",
-        question: "Quelle démarche est la plus cohérente avec l'écoconception lorsqu'on utilise un outil de génération d'images ?",
+        question: "Lorsque vous partagez une image générée, sous quelle forme l'envoyez-vous ?",
         answers: [
-            { text: "Définir le besoin, choisir une résolution adaptée à l'affichage réel et un modèle suffisant, puis réutiliser les résultats pertinents.", correct: true },
-            { text: "Toujours générer à la résolution maximale, pour pouvoir réduire l'image ensuite si besoin.", why: "Générer plus grand que nécessaire multiplie les calculs pour des détails qui ne seront jamais vus." },
-            { text: "Activer le thème sombre de l'outil, ce qui compense la consommation de la génération.", why: "Un thème sombre peut réduire la consommation de certains écrans (OLED notamment) mais presque pas celle d'autres (LCD), et il n'a aucun effet sur le calcul réalisé par le GPU." },
-            { text: "Relancer plusieurs fois la même demande pour être sûr d'obtenir la meilleure qualité.", why: "Chaque nouvel essai ajoute un calcul complet : mieux vaut affiner la demande." }
+            { text: "Dans un format compressé et à la bonne taille (JPEG, WebP…)" },
+            { text: "Dans le fichier d'origine, sans y toucher", recommendation: "Convertissez vos images en WebP ou JPEG, à la taille utile, avant de les partager." },
+            { text: "Je ne sais pas", recommendation: "Convertissez vos images en WebP ou JPEG, à la taille utile, avant de les partager." }
         ],
-        explanation: "L'écoconception consiste à répondre au besoin avec le moins de ressources possible, sans sacrifier l'utilité du résultat : générer seulement quand c'est nécessaire, au bon format, avec un modèle adapté, et réutiliser ce qui existe déjà.",
-        takeaway: "Générer seulement si nécessaire, au bon format, avec un modèle adapté, et réutiliser ce qui existe."
+        info: "Une image générée est souvent un fichier PNG volumineux. La convertir dans un format compressé, à sa taille d'affichage, réduit les données transférées et stockées à chaque partage.",
+        extra: "",
+        source: ""
     }
 ];
 
-const TYPE_LABELS = {
-    single: "Choix unique",
-    multiple: "Choix multiples : sélectionnez toutes les réponses valides",
-    truefalse: "Vrai ou faux"
-};
+// Nombre d'images générées par an = besoins par semaine × 52 × lancements par besoin × images par lancement.
+function computeEstimate(answerIndexes) {
+    const valueOf = key => {
+        const index = questions.findIndex(question => question.key === key);
+        return questions[index].answers[answerIndexes[index]].value;
+    };
 
-// Bonne réponse si et seulement si l'ensemble sélectionné est exactement l'ensemble des bonnes réponses.
-function isAnswerCorrect(question, selectedIndexes) {
-    const expected = question.answers
-        .map((answer, index) => (answer.correct ? index : -1))
-        .filter(index => index !== -1);
+    const imagesPerYear = valueOf("needs") * 52 * valueOf("launches") * valueOf("perLaunch");
 
-    return selectedIndexes.length === expected.length
-        && expected.every(index => selectedIndexes.includes(index));
+    return {
+        imagesPerYear,
+        energyWh: imagesPerYear * ENERGY.imageWh,
+        energyWorstWh: imagesPerYear * ENERGY.imageWorstWh
+    };
 }
 
-function getAppreciation(score) {
-    if (score <= 3) return "Les bases sont encore à découvrir";
-    if (score <= 6) return "Les notions principales sont comprises";
-    if (score <= 8) return "Bonne compréhension de l'écoconception";
-    return "Très bonne maîtrise du sujet";
+function formatNumber(value) {
+    return value.toLocaleString("fr-FR", { maximumFractionDigits: value < 10 ? 1 : 0 });
+}
+
+function formatEnergy(wh) {
+    return wh >= 1000 ? `${formatNumber(wh / 1000)} kWh` : `${formatNumber(wh)} Wh`;
 }
 
 if (typeof document !== "undefined") {
     let currentQuestionIndex = 0;
-    let results = [];
-    let isLocked = false;
+    let userAnswers = [];
 
     const validateButton = document.getElementById("validate-btn");
     const nextButton = document.getElementById("next-btn");
     const questionContainer = document.getElementById("question-container");
     const infoWrapper = document.getElementById("info");
+    const extraInfoWrapper = document.getElementById("extra-info");
     const infoText = document.getElementById("info-text");
+    const extraInfoText = document.getElementById("extra-info-text");
+    const sourceText = document.getElementById("source-text");
     const progressBar = document.getElementById("progress-bar");
     const progressText = document.getElementById("quiz-progress-text");
 
     validateButton.addEventListener("click", validateAnswer);
     nextButton.addEventListener("click", loadNextQuestion);
 
-    function getSelectedIndexes() {
-        return Array.from(document.querySelectorAll('input[name="answer"]:checked'))
-            .map(input => Number(input.value));
-    }
-
     function loadQuestion(index) {
         const questionData = questions[index];
-        const inputType = questionData.type === "multiple" ? "checkbox" : "radio";
 
-        isLocked = false;
         updateProgress(index);
 
         questionContainer.innerHTML = `
-            <fieldset class="quiz-ia-fieldset">
-                <legend>
-                    <span class="quiz-ia-type">${TYPE_LABELS[questionData.type]}</span>
-                    <h2 id="question-title" tabindex="-1">${questionData.question}</h2>
-                </legend>
-                <div class="answers-list">
-                    ${questionData.answers.map((answer, answerIndex) => `
-                        <label class="answer-option">
-                            <input type="${inputType}" name="answer" value="${answerIndex}">
-                            <span>${answer.text}</span>
-                        </label>
-                    `).join("")}
-                </div>
-            </fieldset>
+            <h2 id="question-title" tabindex="-1">${questionData.question}</h2>
+            <div class="answers-list" role="radiogroup" aria-labelledby="question-title">
+                ${questionData.answers.map((answer, answerIndex) => `
+                    <label class="answer-option">
+                        <input type="radio" name="answer" value="${answerIndex}">
+                        <span>${answer.text}</span>
+                    </label>
+                `).join("")}
+            </div>
         `;
 
         questionContainer.querySelectorAll('input[name="answer"]').forEach(input => {
             input.addEventListener("change", () => {
-                validateButton.disabled = getSelectedIndexes().length === 0;
+                validateButton.disabled = false;
             });
         });
 
         infoWrapper.style.display = "none";
+        extraInfoWrapper.style.display = "none";
         infoText.innerHTML = "";
+        extraInfoText.innerHTML = "";
+        sourceText.innerHTML = "";
 
         validateButton.disabled = true;
         validateButton.style.display = "inline-block";
@@ -223,82 +219,39 @@ if (typeof document !== "undefined") {
     }
 
     function validateAnswer() {
-        const selectedIndexes = getSelectedIndexes();
+        const selectedAnswer = document.querySelector('input[name="answer"]:checked');
 
-        if (isLocked || selectedIndexes.length === 0) {
+        // Une seule validation par question : les réponses sont verrouillées ensuite.
+        if (!selectedAnswer || userAnswers.length > currentQuestionIndex) {
             return;
         }
 
-        isLocked = true;
-
-        const questionData = questions[currentQuestionIndex];
-        const correct = isAnswerCorrect(questionData, selectedIndexes);
-        results.push(correct);
+        userAnswers.push(Number(selectedAnswer.value));
 
         document.querySelectorAll('input[name="answer"]').forEach(input => {
             input.disabled = true;
-
-            const answer = questionData.answers[Number(input.value)];
-            const label = input.closest(".answer-option");
-
-            if (answer.correct) {
-                label.classList.add("is-correct");
-                label.insertAdjacentHTML("beforeend", '<span class="answer-badge"><i class="fa-solid fa-check" aria-hidden="true"></i> Bonne réponse</span>');
-            } else if (input.checked) {
-                label.classList.add("is-wrong");
-                label.insertAdjacentHTML("beforeend", '<span class="answer-badge"><i class="fa-solid fa-xmark" aria-hidden="true"></i> Votre choix, incorrect</span>');
-            }
         });
 
-        showCorrection(questionData, selectedIndexes, correct);
+        showInformation(questions[currentQuestionIndex]);
 
         validateButton.style.display = "none";
-        nextButton.textContent = currentQuestionIndex === questions.length - 1 ? "Voir les résultats" : "Question suivante";
+        nextButton.textContent = currentQuestionIndex === questions.length - 1 ? "Voir mon résultat" : "Suivant";
         nextButton.style.display = "inline-block";
         nextButton.focus();
     }
 
-    function showCorrection(questionData, selectedIndexes, correct) {
-        const correctAnswers = questionData.answers.filter(answer => answer.correct);
-        const wrongChoices = selectedIndexes
-            .map(index => questionData.answers[index])
-            .filter(answer => !answer.correct);
-        const missedAnswers = correctAnswers
-            .filter(answer => !selectedIndexes.includes(questionData.answers.indexOf(answer)));
-
-        let mistakes = "";
-
-        if (wrongChoices.length > 0) {
-            mistakes += `
-                <p><strong class="strong-yellow">Pourquoi votre choix ne convient pas :</strong></p>
-                <ul>${wrongChoices.map(answer => `<li><em>« ${answer.text} »</em> ${answer.why}</li>`).join("")}</ul>
-            `;
-        }
-
-        if (questionData.type === "multiple" && missedAnswers.length > 0) {
-            mistakes += `
-                <p><strong class="strong-yellow">Réponse${missedAnswers.length > 1 ? "s" : ""} valide${missedAnswers.length > 1 ? "s" : ""} oubliée${missedAnswers.length > 1 ? "s" : ""} :</strong></p>
-                <ul>${missedAnswers.map(answer => `<li>${answer.text}</li>`).join("")}</ul>
-            `;
-        }
-
-        infoWrapper.classList.toggle("is-correct", correct);
-        infoWrapper.classList.toggle("is-wrong", !correct);
-
-        infoText.innerHTML = `
-            <p class="quiz-ia-status">
-                <i class="fa-solid ${correct ? "fa-circle-check" : "fa-circle-xmark"}" aria-hidden="true"></i>
-                ${correct ? "Bonne réponse !" : "Réponse incorrecte."}
-            </p>
-            ${correctAnswers.length > 1
-                ? `<p><strong>Les bonnes réponses :</strong></p>
-                   <ul>${correctAnswers.map(answer => `<li>${answer.text}</li>`).join("")}</ul>`
-                : `<p><strong>La bonne réponse :</strong> ${correctAnswers[0].text}</p>`}
-            <p><strong>Explication :</strong> ${questionData.explanation}</p>
-            ${mistakes}
-        `;
-
+    function showInformation(question) {
+        infoText.innerHTML = `<p><strong>Information :</strong> ${question.info}</p>`;
         infoWrapper.style.display = "block";
+
+        if (question.extra) {
+            extraInfoText.innerHTML = `<p><strong class="strong-yellow">Comparaison :</strong> ${question.extra}</p>`;
+            extraInfoWrapper.style.display = "block";
+        }
+
+        if (question.source) {
+            sourceText.innerHTML = `<em>Source :</em> ${question.source}`;
+        }
     }
 
     function loadNextQuestion() {
@@ -306,10 +259,11 @@ if (typeof document !== "undefined") {
 
         if (currentQuestionIndex < questions.length) {
             loadQuestion(currentQuestionIndex);
-            document.getElementById("question-title").focus();
         } else {
             showResults();
         }
+
+        document.getElementById("question-title").focus();
     }
 
     function updateProgress(index) {
@@ -318,60 +272,119 @@ if (typeof document !== "undefined") {
     }
 
     function showResults() {
-        const score = results.filter(Boolean).length;
-        const percentage = Math.round((score / questions.length) * 100);
+        const estimate = computeEstimate(userAnswers);
+        const recommendations = [...new Set(userAnswers
+            .map((answerIndex, questionIndex) => questions[questionIndex].answers[answerIndex].recommendation)
+            .filter(Boolean))];
 
         infoWrapper.style.display = "none";
+        extraInfoWrapper.style.display = "none";
+        sourceText.innerHTML = "";
         validateButton.style.display = "none";
         nextButton.style.display = "none";
 
         progressText.textContent = "Quiz terminé";
         progressBar.style.width = "100%";
 
+        const summary = estimate.imagesPerYear === 0
+            ? `
+                <h2 class="quiz-results-title" id="question-title" tabindex="-1">
+                    Résultat : <strong>vous ne générez presque jamais d'images</strong>
+                </h2>
+                <p class="quiz-end-copy">
+                    Votre consommation liée à la génération d'images est très faible.
+                    Les bonnes pratiques ci-dessous restent utiles le jour où vous en aurez besoin.
+                </p>
+            `
+            : `
+                <h2 class="quiz-results-title" id="question-title" tabindex="-1">
+                    Résultat du quiz :
+                    <strong>environ ${formatEnergy(estimate.energyWh)} par an</strong>
+                </h2>
+
+                <div class="result-grid">
+                    <div class="result-card">
+                        <p class="result-value">${formatNumber(estimate.imagesPerYear)}</p>
+                        <p class="result-label">images générées par an</p>
+                    </div>
+
+                    <div class="result-card">
+                        <p class="result-value">${formatNumber(estimate.energyWh / ENERGY.smartphoneChargeWh)}</p>
+                        <p class="result-label">recharges de smartphone</p>
+                    </div>
+
+                    <div class="result-card">
+                        <p class="result-value">${formatNumber(estimate.energyWh / ENERGY.ledBulbW)}</p>
+                        <p class="result-label">heures d'éclairage d'une ampoule LED de 10 W</p>
+                    </div>
+
+                    <div class="result-card">
+                        <p class="result-value">${formatNumber(estimate.energyWh / ENERGY.textRequestWh)}</p>
+                        <p class="result-label">requêtes de génération de texte</p>
+                    </div>
+                </div>
+
+                <p class="quiz-end-copy">
+                    Avec un modèle peu efficace, le même usage pourrait consommer jusqu'à
+                    <strong>${formatEnergy(estimate.energyWorstWh)} par an</strong>.
+                    Ces équivalences donnent un ordre de grandeur, pas une mesure de votre consommation réelle.
+                </p>
+            `;
+
         questionContainer.innerHTML = `
-            <h2 class="quiz-results-title" id="question-title" tabindex="-1">
-                Résultat : <strong>${getAppreciation(score)}</strong>
-            </h2>
+            ${summary}
 
-            <div class="result-grid">
-                <div class="result-card">
-                    <p class="result-value">${score} / ${questions.length}</p>
-                    <p class="result-label">bonnes réponses</p>
-                </div>
-
-                <div class="result-card">
-                    <p class="result-value">${percentage} %</p>
-                    <p class="result-label">de réussite</p>
-                </div>
+            <div class="quiz-calculations quiz-recommendations">
+                <h3>Recommandations personnalisées</h3>
+                <ul>
+                    ${(recommendations.length > 0
+                        ? recommendations
+                        : ["Vos habitudes sont déjà sobres : continuez à générer uniquement quand c'est utile, au bon format, et à réutiliser vos images."])
+                        .map(recommendation => `<li>${recommendation}</li>`).join("")}
+                </ul>
             </div>
 
-            <h3 class="quiz-ia-recap-title">Notions à retenir</h3>
-            <ul class="quiz-ia-recap">
-                ${questions.map((question, index) => `
-                    <li class="${results[index] ? "is-correct" : "is-wrong"}">
-                        <i class="fa-solid ${results[index] ? "fa-check" : "fa-rotate-left"}" aria-hidden="true"></i>
-                        <span>
-                            <strong>${question.theme}</strong>
-                            <span class="quiz-ia-recap-state">(${results[index] ? "acquise" : "à revoir"})</span> :
-                            ${question.takeaway}
-                        </span>
+            <details class="quiz-calculations">
+                <summary>Voir les explications des calculs</summary>
+
+                <ul>
+                    <li>
+                        Images par an = demandes par semaine × 52 semaines × lancements par demande × images par lancement.
+                        Pour chaque tranche, la valeur retenue est le milieu de l'intervalle (par exemple 6,5 pour « 3 à 10 fois »)
+                        et 15 ou 12 pour les réponses « plus de ».
                     </li>
-                `).join("")}
-            </ul>
+                    <li>
+                        Énergie moyenne par image : 2,9 Wh (2,907 kWh pour 1 000 images, moyenne de plusieurs modèles
+                        mesurés sur un GPU NVIDIA A100). Modèle le moins efficace : 11,5 Wh par image.
+                        <strong>Source :</strong> A. S. Luccioni, Y. Jernite et E. Strubell, FAccT 2024 [1].
+                    </li>
+                    <li>
+                        Une recharge de smartphone : 22 Wh (US EPA, 2024, valeur reprise par la même étude).
+                        Une requête de génération de texte : 0,047 Wh (même étude).
+                        Une ampoule LED de 10 W consomme 10 Wh par heure.
+                    </li>
+                    <li>
+                        Limites : l'estimation ne tient compte ni de la fabrication du matériel, ni du réseau, ni de l'entraînement
+                        des modèles. Les services réels peuvent être plus ou moins efficaces que les modèles de l'étude, et les
+                        émissions de CO₂ dépendent du mix électrique du lieu de calcul.
+                    </li>
+                    <li>${SOURCE_LUCCIONI}</li>
+                </ul>
+            </details>
 
             <div class="button-container quiz-results-actions">
                 <button type="button" id="restart-btn" class="button">Recommencer le quiz</button>
-                <a href="./quizz-access.html" class="button-secondary">Autres quiz</a>
+                <a href="./quizz-access.html" class="button">Encore un quiz</a>
+                <a href="./quelques-chiffres.html" class="button-secondary">Quelques chiffres</a>
             </div>
         `;
 
         document.getElementById("restart-btn").addEventListener("click", restartQuiz);
-        document.getElementById("question-title").focus();
     }
 
     function restartQuiz() {
         currentQuestionIndex = 0;
-        results = [];
+        userAnswers = [];
         loadQuestion(0);
         document.getElementById("question-title").focus();
     }
@@ -380,5 +393,5 @@ if (typeof document !== "undefined") {
 }
 
 if (typeof module !== "undefined") {
-    module.exports = { questions, isAnswerCorrect, getAppreciation };
+    module.exports = { questions, computeEstimate, ENERGY };
 }
