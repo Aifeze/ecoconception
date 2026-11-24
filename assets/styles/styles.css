@@ -29,6 +29,10 @@
     box-sizing: border-box;
 }
 
+html {
+    scroll-padding-top: 90px;
+}
+
 /* Layout styling */
 body {
     font-family: var(--font-main);
@@ -202,6 +206,24 @@ ul {
     font-family:'Segoe UI';
 }
 
+body,
+button,
+input,
+select,
+textarea {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+header,
+nav,
+nav ul,
+nav li,
+nav a,
+.back-link,
+.back-text {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
 ul {
     padding-left: 20px;
 }
@@ -344,26 +366,6 @@ a {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 24px;
-}
-
-/* Variante à 4 cartes : Chiffres, Quiz, Simulateur, Ateliers */
-.home-main-links--4 {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-/* Titres alignés en haut des cartes, boutons alignés en bas */
-.home-main-links--4 .home-feature-card {
-    justify-content: flex-start;
-}
-
-.home-main-links--4 .home-card-button {
-    margin-top: auto;
-}
-
-@media screen and (max-width: 1280px) {
-    .home-main-links--4 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
 }
 
 .home-feature-card {
@@ -1027,6 +1029,43 @@ label {
     gap: 22px;
 }
 
+/* ── Bouton copier des blocs de code (pages langages) ── */
+.code-block {
+    position: relative;
+}
+
+.copy-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    padding: 3px 8px;
+    font-size: 0.75rem;
+    font-family: inherit;
+    color: #e8e8e8;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.copy-btn:hover,
+.copy-btn:focus-visible {
+    opacity: 1;
+}
+
+.copy-btn:disabled {
+    cursor: default;
+}
+
+/* Inutile sur papier */
+@media print {
+    .copy-btn {
+        display: none;
+    }
+}
+
 .ranking-card {
     padding: 22px;
     border-radius: 20px;
@@ -1565,29 +1604,374 @@ sup a {
     min-height: 210px;
 }
 
+/* Les deux cards (CO₂ puis distance en voiture) sont toujours visibles :
+   plus d'effet au survol, l'analogie reste lisible au toucher. */
 .stat-item-container {
-    position: relative;
+    display: contents;
 }
 
-.stat-item-container .stat-item {
+/* Fiches avec la card "distance en voiture" : 4 cards sur la même ligne */
+.stats-icons:has(.stat-item-container) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    align-items: stretch;
+}
+
+.stats-icons:has(.stat-item-container) .stat-item {
+    height: auto;
+    min-height: 0;
+}
+
+@media (max-width: 1100px) {
+    .stats-icons:has(.stat-item-container) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .stats-icons:has(.stat-item-container) {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ANALOGIES DANS LES CARDS DES FICHES
+   Sous chaque chiffre : un petit visuel + une phrase "En clair".
+   Toujours visible (pas de survol). La couleur suit --service-color. */
+.ana {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed color-mix(in srgb, var(--service-color) 45%, transparent);
+    color: var(--service-color);
+    text-align: center;
+}
+
+.ana-viz {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 46px;
+    margin-bottom: 10px;
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+.ana-viz b {
+    font-size: 1rem;
+}
+
+.ana-viz small {
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.ana .ana-text {
+    margin: 0;
+    color: var(--text-color);
+    font-size: 0.92rem;
+    line-height: 1.5;
+    text-align: center;
+}
+
+/* Cards claires (dégradés) : texte sombre */
+.compare-card {
+    min-width: 0;
+}
+
+.compare-card p {
+    color: #1f2937;
+}
+
+.compare-card .ana {
+    border-top-color: rgba(31, 41, 55, 0.35);
+    color: #1f2937;
+}
+
+.compare-card .ana .ana-text {
+    color: #1f2937;
+}
+
+/* Barre de proportion (ex. 190 pays sur 195) */
+.ana-bar {
+    width: 100%;
+    height: 12px;
+    border-radius: 999px;
+    background: rgba(232, 232, 232, 0.14);
+    overflow: hidden;
+}
+
+.ana-bar span {
+    display: block;
+    width: var(--v);
+    height: 100%;
+    border-radius: 999px;
+    background: var(--service-color);
+}
+
+/* Règle graduée (ex. 20 cm) */
+.ana-ruler {
+    width: 100%;
+    height: 24px;
+    border: 2px solid currentColor;
+    border-radius: 3px;
+    background: repeating-linear-gradient(90deg, currentColor 0 1.5px, transparent 1.5px 10%) bottom / 100% 50% no-repeat;
+}
+
+/* Mesure sous une rangée d'objets (ex. 10 m) */
+.ana-measure {
+    position: relative;
+    width: 100%;
+    height: 14px;
+    border-bottom: 2px solid currentColor;
+}
+
+.ana-measure::before,
+.ana-measure::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    width: 2px;
+    height: 12px;
+    background: currentColor;
+}
+
+.ana-measure::before {
+    left: 0;
+}
+
+.ana-measure::after {
+    right: 0;
+}
+
+.ana-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
     width: 100%;
 }
 
-.stat-item-container #stat-item-hover {
+/* Terrains de foot miniatures (1 terrain = 105 m) */
+.ana-pitches {
+    display: grid;
+    grid-template-columns: repeat(var(--n, 5), 1fr);
+    gap: 6px;
+    width: 100%;
+}
+
+.ana-pitches i {
+    position: relative;
+    aspect-ratio: 105 / 68;
+    border: 1.5px solid currentColor;
+    border-radius: 2px;
+    overflow: hidden;
+    background: linear-gradient(currentColor, currentColor) center / 1.5px 100% no-repeat;
+}
+
+.ana-pitches i::before {
+    content: "";
     position: absolute;
-    inset: 0;
-    opacity: 0;
-    visibility: hidden;
+    inset: 0 auto 0 0;
+    width: var(--fill, 100%);
+    background: currentColor;
+    opacity: 0.28;
 }
 
-.stat-item-container:hover #stat-item-base {
-    opacity: 0;
-    visibility: hidden;
+/* Ampoules allumées / éteintes */
+.ana-off {
+    opacity: 0.3;
+    filter: grayscale(1);
 }
 
-.stat-item-container:hover #stat-item-hover {
-    opacity: 1;
-    visibility: visible;
+/* Verre plein */
+.ana-glass {
+    width: 36px;
+    height: 46px;
+    border: 3px solid currentColor;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    background: color-mix(in srgb, currentColor 45%, transparent);
+}
+
+.ana-viz svg {
+    width: 86px;
+    height: auto;
+}
+
+.ana-viz svg.ana-earth {
+    width: 76px;
+}
+
+.ana-viz svg.ana-icon {
+    width: 26px;
+}
+
+.ana-viz svg.ana-car {
+    width: 56px;
+}
+
+.ana-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Blocs d'unité : la dernière peut être partielle (ex. 2,6 terrains) */
+.ana-units {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+}
+
+.ana-units i {
+    width: calc(var(--uw, 30px) * var(--u, 1));
+    height: 18px;
+    border-radius: 4px;
+    background: currentColor;
+    opacity: 0.8;
+}
+
+.ana-units i.part {
+    opacity: 0.45;
+}
+
+.ana-cells i.more {
+    background: currentColor;
+    opacity: 0.45;
+}
+
+/* Phrase d'analogie sous une barre de comparaison */
+.comparison-item .ana-line {
+    margin: 8px 0 0;
+    color: var(--text-color);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.ana-bar + small {
+    display: block;
+    margin: 3px 0 6px;
+    font-size: 0.78rem;
+    font-weight: bold;
+}
+
+/* Cases (ex. 1 sur 4, 3 sur 10) */
+.ana-cells {
+    display: grid;
+    grid-template-columns: repeat(var(--c, 4), 1fr);
+    gap: 4px;
+    width: 100%;
+}
+
+.ana-cells i {
+    height: var(--h, 16px);
+    border-radius: 3px;
+    background: rgba(232, 232, 232, 0.14);
+}
+
+.ana-cells i.on {
+    background: currentColor;
+}
+
+/* Terrain / court rempli en proportion */
+.ana-court {
+    position: relative;
+    width: 100%;
+    max-height: 110px;
+    aspect-ratio: var(--ar, 2);
+    border: 2px solid currentColor;
+    border-radius: 4px;
+    overflow: hidden;
+    background: linear-gradient(currentColor, currentColor) center / 1.5px 100% no-repeat;
+}
+
+.ana-court::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--fill);
+    background: currentColor;
+    opacity: 0.3;
+}
+
+/* Batterie de smartphone */
+.ana-battery {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 78%;
+    max-width: 200px;
+    height: 40px;
+    border: 3px solid currentColor;
+    border-radius: 9px;
+}
+
+.ana-battery::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--level);
+    border-radius: 5px 0 0 5px;
+    background: currentColor;
+    opacity: 0.45;
+}
+
+.ana-battery::after {
+    content: "";
+    position: absolute;
+    top: 9px;
+    right: -10px;
+    width: 5px;
+    height: 14px;
+    border-radius: 0 3px 3px 0;
+    background: currentColor;
+}
+
+.ana-battery b {
+    position: relative;
+}
+
+/* Bouteilles d'eau de 1,5 L */
+.ana-bottles {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 6px;
+}
+
+.ana-bottle {
+    position: relative;
+    width: 16px;
+    height: 38px;
+    border: 2px solid currentColor;
+    border-radius: 6px 6px 4px 4px;
+    overflow: hidden;
+}
+
+.ana-bottle::before {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: var(--fill, 100%);
+    background: currentColor;
+    opacity: 0.45;
+}
+
+.ana-bottle::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 6px;
+    height: 5px;
+    background: currentColor;
+    transform: translateX(-50%);
 }
 
 /* En Pratique - Écoconception Numérique */
@@ -2043,6 +2427,7 @@ pre code {
         display: block;
         text-align: center;
         border-bottom: 1px solid rgba(47, 223, 173, 0.1);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     }
 
     nav a::after {
