@@ -46,22 +46,24 @@
         <section class="intro-text">
             <p>
                 Tous les langages de programmation ne se valent pas en termes d'<strong>efficacité énergétique</strong>.
-                Le choix d'un langage peut avoir un <strong>impact significatif</strong> sur la consommation d'énergie,
+                Le choix d'un langage peut avoir un <strong>impact significatif</strong> sur la <a href="terminologie.html#consommation_energie"><strong>consommation d'énergie</strong></a>,
                 les émissions de CO₂ et l'empreinte écologique globale d'une application.
             </p>
             <br>
             <p>
                 Cette section présente une <strong>analyse comparative</strong> des langages de programmation
                 sous l'angle de l'écoconception, avec des <strong>règles d'optimisation concrètes</strong>
-                pour réduire l'impact environnemental de votre code.
+                pour réduire l'<a href="terminologie.html#impact_environnemental">impact environnemental</a> de votre code.
             </p>
         </section>
 
         <section>
             <h2>Classement énergétique des langages</h2>
             <p>
-                Selon l'étude de l'Université de Minho (Portugal), les langages compilés sont
-                <strong>significativement plus économes</strong> que les langages interprétés :
+                Selon l'étude de l'Université de Minho (Portugal) <sup><a href="#source1">[1]</a></sup>, les langages compilés sont
+                <strong>significativement plus économes</strong> que les langages interprétés.
+                Les valeurs ci-dessous indiquent l'énergie consommée <strong>par rapport au C</strong>
+                (C = 1,00) sur un ensemble de 10 programmes de test, avec le rang sur 27 langages :
             </p>
 
             <div class="language-ranking">
@@ -72,11 +74,11 @@
                     </h3>
 
                     <ul>
-                        <li><strong>C</strong> (77 joules)</li>
-                        <li><strong>C++</strong> (79 joules)</li>
-                        <li><strong>Rust</strong> (80 joules)</li>
-                        <li><strong>Ada</strong> (98 joules)</li>
-                        <li><strong>Java</strong> (114 joules)</li>
+                        <li><strong>C</strong> (1,00) - 1ᵉʳ/27</li>
+                        <li><strong>Rust</strong> (1,03) - 2ᵉ/27</li>
+                        <li><strong>C++</strong> (1,34) - 3ᵉ/27</li>
+                        <li><strong>Ada</strong> (1,70) - 4ᵉ/27</li>
+                        <li><strong>Java</strong> (1,98) - 5ᵉ/27</li>
                     </ul>
 
                     <p>
@@ -92,10 +94,9 @@
                     </h3>
 
                     <ul>
-                        <li><strong>C#</strong> (555 joules)</li>
-                        <li><strong>Go</strong> (650 joules)</li>
-                        <li><strong>JavaScript</strong> (1817 joules)</li>
-                        <li><strong>PHP</strong> (2213 joules) - 21ᵉ/27</li>
+                        <li><strong>C#</strong> (3,14) - 13ᵉ/27</li>
+                        <li><strong>Go</strong> (3,23) - 14ᵉ/27</li>
+                        <li><strong>JavaScript</strong> (4,45) - 17ᵉ/27</li>
                     </ul>
 
                     <p>
@@ -111,10 +112,11 @@
                     </h3>
 
                     <ul>
-                        <li><strong>Python</strong> (4390 joules) - 26ᵉ/27</li>
-                        <li><strong>Ruby</strong> (4267 joules)</li>
-                        <li><strong>Perl</strong> (4541 joules)</li>
-                        <li><strong>Lua</strong> (2892 joules)</li>
+                        <li><strong>PHP</strong> (29,30) - 21ᵉ/27</li>
+                        <li><strong>Lua</strong> (45,98) - 23ᵉ/27</li>
+                        <li><strong>Ruby</strong> (69,91) - 25ᵉ/27</li>
+                        <li><strong>Python</strong> (75,88) - 26ᵉ/27</li>
+                        <li><strong>Perl</strong> (79,58) - 27ᵉ/27</li>
                     </ul>
 
                     <p>
@@ -129,11 +131,20 @@
 
                 <p>
                     <strong>À retenir :</strong>
-                    Python peut consommer jusqu’à
-                    <strong>45× plus d’énergie</strong> que C++
-                    pour exécuter les mêmes programmes.
+                    dans cette étude, Python consomme en moyenne environ
+                    <strong>57× plus d’énergie</strong> que C++ (et 76× plus que C)
+                    pour exécuter les mêmes programmes <sup><a href="#source1">[1]</a></sup>.
                 </p>
             </aside>
+
+            <p style="margin-top: 20px;">
+                <strong>À nuancer :</strong> ce classement repose sur des programmes de test très optimisés.
+                Une étude de 2024 (prépublication) <sup><a href="#source7">[7]</a></sup> montre qu'une fois pris en compte
+                d'autres facteurs (implémentation du langage, code du programme, nombre de cœurs utilisés, activité mémoire),
+                le langage n'a pas d'effet significatif sur l'énergie au-delà de son effet sur le <strong>temps d'exécution</strong>.
+                Autrement dit, c'est d'abord la rapidité du programme qui compte : le choix du langage a un impact, mais
+                <strong>bien coder compte tout autant</strong>. C'est l'objet des règles d'éco-conception ci-dessous.
+            </p>
         </section>
 
         <section style="margin-top: 50px;">
@@ -164,10 +175,10 @@
                     </p>
                     <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
                         <span style="background-color: rgba(119, 123, 180, 0.2); padding: 5px 10px; border-radius: 12px; font-size: 0.85rem;">
-                            <i class="fas fa-bolt"></i> Performance ×4
+                            <i class="fas fa-bolt"></i> Jusqu'à ×4 (concaténation)
                         </span>
                         <span style="background-color: rgba(119, 123, 180, 0.2); padding: 5px 10px; border-radius: 12px; font-size: 0.85rem;">
-                            <i class="fas fa-memory"></i> -60% mémoire
+                            <i class="fas fa-memory"></i> Jusqu'à -60% mémoire
                         </span>
                         <span style="background-color: rgba(119, 123, 180, 0.2); padding: 5px 10px; border-radius: 12px; font-size: 0.85rem;">
                             <i class="fas fa-leaf"></i> 10 éco-rules
@@ -227,7 +238,7 @@
                             <i class="fas fa-code"></i> Interprété
                         </span>
                         <span style="background-color: rgba(255, 212, 59, 0.2); padding: 5px 10px; border-radius: 12px; font-size: 0.85rem;">
-                            <i class="fas fa-fire"></i> 45× vs C++
+                            <i class="fas fa-fire"></i> ≈ 57× vs C++
                         </span>
                     </div>
                     <a href="./langages/python.html" class="button" style="margin-top: 25px; display: inline-block; background-color: #ffd43b; color: black; padding: 12px 25px; text-decoration: none; border-radius: 25px; font-weight: bold; transition: all 0.3s;">
@@ -243,7 +254,7 @@
                     <i class="fas fa-code" style="font-size: 4rem; color: #639de1; margin-bottom: 20px;"></i>
                     <h3 style="color: #639de1; font-size: 1.8rem; margin-bottom: 10px;">C / C++</h3>
                     <p style="color: var(--text-color-light); margin-bottom: 15px;">
-                        1ᵉʳ et 2ᵉ en efficacité énergétique
+                        1ᵉʳ (C) et 3ᵉ (C++) en efficacité énergétique
                     </p>
                     <p style="font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
                         Découvrez <strong>10 règles d'optimisation</strong> pour C et C++, les champions de 
@@ -254,7 +265,7 @@
                             <i class="fas fa-trophy"></i> Champion
                         </span>
                         <span style="background-color: rgba(99, 157, 225, 0.2); padding: 5px 10px; border-radius: 12px; font-size: 0.85rem;">
-                            <i class="fas fa-leaf"></i> 77 joules
+                            <i class="fas fa-leaf"></i> Référence : 1,00
                         </span>
                     </div>
                     <a href="./langages/c.html" class="button" style="margin-top: 25px; display: inline-block; background-color: #639de1; color: white; padding: 12px 25px; text-decoration: none; border-radius: 25px; font-weight: bold; transition: all 0.3s;">
@@ -300,7 +311,7 @@
                     <i class="fas fa-bullseye" style="font-size: 4rem; color: #00b4d8; margin-bottom: 20px;"></i>
                     <h3 style="color: #00b4d8; font-size: 1.8rem; margin-bottom: 10px;">Dart</h3>
                     <p style="color: var(--text-color-light); margin-bottom: 15px;">
-                        Langage optimisé pour UI mobile et web
+                        15ᵉ/27 en efficacité énergétique
                     </p>
                     <p style="font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
                         Découvrez <strong>10 règles d'optimisation</strong> pour Dart et Flutter : utilisation de const,
@@ -331,7 +342,7 @@
                     <i class="fab fa-js" style="font-size: 4rem; color: #f7df1e; margin-bottom: 20px;"></i>
                     <h3 style="color: #f7df1e; font-size: 1.8rem; margin-bottom: 10px;">JavaScript</h3>
                     <p style="color: var(--text-color-light); margin-bottom: 15px;">
-                        18ᵉ/27 en efficacité énergétique
+                        17ᵉ/27 en efficacité énergétique
                     </p>
                     <p style="font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
                         Découvrez <strong>10 règles d'optimisation</strong> pour JavaScript :
@@ -369,10 +380,11 @@
                     </h3>
 
                     <p>
-                        Les data centers consomment
-                        <strong>2% de l’électricité mondiale</strong>,
-                        et d’ici 2040, le secteur TIC pourrait représenter
-                        <strong>14% du carbone mondial</strong>.
+                        Les data centers consomment environ
+                        <strong>1,5 % de l’électricité mondiale</strong> (2024),
+                        une consommation qui pourrait plus que doubler d’ici 2030 (environ 945 TWh) <sup><a href="#source5">[5]</a></sup>.
+                        Sans changement de trajectoire, les émissions du numérique pourraient dépasser en 2040
+                        <strong>l’équivalent de 14 % des émissions mondiales de 2016</strong> <sup><a href="#source6">[6]</a></sup>.
                     </p>
                 </article>
 
@@ -384,8 +396,8 @@
 
                     <p>
                         Un même algorithme en Python peut consommer
-                        <strong>45× plus d’énergie</strong>
-                        qu’en C++. Le choix du langage n’est donc pas neutre
+                        <strong>environ 57× plus d’énergie</strong>
+                        qu’en C++ <sup><a href="#source1">[1]</a></sup>. Le choix du langage n’est donc pas neutre
                         d’un point de vue environnemental.
                     </p>
                 </article>
@@ -414,7 +426,11 @@
                     <strong>[1]</strong> Pereira, R., Couto, M., Ribeiro, F., Rua, R., Cunha, J., Fernandes, J. P., & Saraiva, J. (2017).
                     <em>Energy efficiency across programming languages: how do energy, time, and memory relate?</em>
                     Proceedings of the 10th ACM SIGPLAN International Conference on Software Language Engineering.
-                    <a href="https://repositorium.uminho.pt/bitstream/1822/69044/1/paper.pdf" target="_blank" rel="noopener">
+                    Valeurs issues du tableau 4 (« Normalized global results »).
+                    <a href="https://doi.org/10.1145/3136014.3136031" target="_blank" rel="noopener">
+                        [DOI]
+                    </a>
+                    <a href="https://greenlab.di.uminho.pt/wp-content/uploads/2017/10/sleFinal.pdf" target="_blank" rel="noopener">
                         [PDF]
                     </a>
                 </li>
@@ -433,6 +449,24 @@
                 <li id="source4">
                     <strong>[4]</strong> Ubiminds (2025). <em>Green Coding Practices: Minimize Software's Carbon Footprint.</em>
                     <a href="https://ubiminds.com/en-us/green-coding-practices/" target="_blank" rel="noopener">
+                        [Lien]
+                    </a>
+                </li>
+                <li id="source5">
+                    <strong>[5]</strong> Agence internationale de l'énergie (AIE) (2025). <em>Energy and AI</em> : environ 415 TWh consommés par les data centers en 2024, soit environ 1,5 % de l'électricité mondiale, et environ 945 TWh prévus en 2030.
+                    <a href="https://www.iea.org/reports/energy-and-ai/executive-summary" target="_blank" rel="noopener">
+                        [Lien]
+                    </a>
+                </li>
+                <li id="source6">
+                    <strong>[6]</strong> Belkhir, L., & Elmeligi, A. (2018). <em>Assessing ICT global emissions footprint: Trends to 2040 &amp; recommendations.</em> Journal of Cleaner Production, 177, 448-463.
+                    <a href="https://doi.org/10.1016/j.jclepro.2017.12.239" target="_blank" rel="noopener">
+                        [DOI]
+                    </a>
+                </li>
+                <li id="source7">
+                    <strong>[7]</strong> van Kempen, N., Kwon, H.-J., Nguyen, D. T., & Berger, E. D. (2024). <em>It's Not Easy Being Green: On the Energy Efficiency of Programming Languages.</em> Prépublication arXiv:2410.05460.
+                    <a href="https://arxiv.org/abs/2410.05460" target="_blank" rel="noopener">
                         [Lien]
                     </a>
                 </li>
