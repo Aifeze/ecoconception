@@ -7,9 +7,11 @@
     <title>TP 05 — Optimiser du code | Écoconception numérique</title>
     <link rel="icon" href="../../assets/img/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="../../assets/styles/styles.css">
-    <link rel="stylesheet" href="../../assets/styles/tp05.css">
+    <link rel="stylesheet" href="../../assets/styles/tp05.css?v=2">
     <script defer src="../../assets/scripts/hamburger.js"></script>
-    <script type="module" src="../../assets/scripts/tp05.js"></script>
+    <script defer src="../../assets/scripts/tp05-exercices.js?v=2"></script>
+    <script defer src="../../assets/scripts/tp05-expression.js?v=2"></script>
+    <script defer src="../../assets/scripts/tp05.js?v=2"></script>
 </head>
 <body class="tp05-page">
     <header>
@@ -31,76 +33,116 @@
         </nav>
     </header>
 
-    <main class="main tp05">
-        <a class="tp05-back" href="../en-pratique.html">← Tous les ateliers</a>
-        <div class="tp05-intro">
-            <p class="tp05-kicker">Atelier 05 · Écoconception du code</p>
-            <h1>Optimiser du code</h1>
-            <p>Gardez le même résultat avec moins de calculs ou moins de copies. Choisissez un langage, étudiez le code de départ et écrivez l’expression qui le remplace.</p>
+    <main class="main tp-main tp05">
+        <section class="tp-header">
+            <h1>TP 05 : Optimisation du code</h1>
+            <div class="tp-summary" aria-label="Informations principales du TP">
+                <span class="tp-summary-item">Thème : Algorithmique et sobriété</span>
+                <span class="tp-summary-separator" aria-hidden="true">•</span>
+                <span class="tp-summary-item">7 langages au choix</span>
+            </div>
+        </section>
+
+        <div class="tp-content">
+            <details class="collapsible tp05-section" open>
+                <summary><h2>Objectif <span class="toggle-icon" aria-hidden="true"></span></h2></summary>
+                <p>Réécrivez du code pour obtenir le même résultat avec moins de calculs ou moins de copies. Vous vérifierez chaque optimisation en comparant le travail effectué sur les mêmes données.</p>
+            </details>
+
+            <details class="collapsible tp05-section">
+                <summary><h2>Prérequis et ressources <span class="toggle-icon" aria-hidden="true"></span></h2></summary>
+                <div class="tp05-section-body">
+                    <p>Il suffit de connaître les variables, opérateurs et tableaux d’un des <a href="../langages.html">langages du site</a>. Le correcteur fonctionne dans le navigateur.</p>
+                </div>
+            </details>
+
+            <details class="collapsible practical-section tp05-section" open>
+                <summary><h2>Exercices pratiques <span class="toggle-icon" aria-hidden="true"></span></h2></summary>
+                <div class="tp05-section-body">
+                    <ol>
+                        <li>Choisissez un langage et un exercice.</li>
+                        <li>Repérez le travail inutile dans le code de départ.</li>
+                        <li>Écrivez une expression équivalente et validez-la pour afficher la comparaison.</li>
+                    </ol>
+
+                    <p id="atelier-status" class="tp-note">Si les champs restent désactivés, le correcteur n’a pas pu se charger. Vérifiez que JavaScript est activé et rechargez la page.</p>
+                    <form id="atelier">
+                        <fieldset id="atelier-controls" disabled aria-label="Éditeur et correcteur">
+                            <div class="tp05-filters">
+                                <div>
+                                    <label for="language">Langage</label>
+                                    <select id="language"><option value="javascript">JavaScript</option></select>
+                                </div>
+                                <div>
+                                    <label for="exercise">Exercice</label>
+                                    <select id="exercise"><option value="sum">Remplacer des additions répétées</option></select>
+                                </div>
+                                <a id="language-guide" href="../langages/javascript.html">Guide JavaScript</a>
+                            </div>
+
+                            <div class="tp05-brief">
+                                <h3 id="exercise-title">Remplacer des additions répétées</h3>
+                                <p id="exercise-description">Calculez la somme des entiers de 1 à n. Quand n vaut 0, la somme vaut 0.</p>
+                            </div>
+
+                            <div class="tp05-workspace">
+                                <div class="tp05-panel">
+                                    <h4>Code de départ</h4>
+                                    <pre tabindex="0" aria-label="Code de départ"><code id="baseline">function somme(n) {
+    let total = 0;
+    for (let i = 1; i &lt;= n; i++) total += i;
+    return total;
+}</code></pre>
+                                    <p id="baseline-note">La boucle additionne un nombre à chaque tour, même lorsqu’un calcul direct suffit.</p>
+                                </div>
+                                <div class="tp05-panel">
+                                    <h4>Votre optimisation</h4>
+                                    <label for="answer">Expression à renvoyer</label>
+                                    <textarea id="answer" name="answer" rows="5" maxlength="240" required
+                                        spellcheck="false" autocapitalize="off" autocomplete="off"
+                                        aria-describedby="inputs syntax"></textarea>
+                                    <p id="inputs">Variable : n, un entier de 0 à 20 000.</p>
+                                    <p id="syntax">Saisissez l’expression seule, sans fonction ni point-virgule.</p>
+                                    <details>
+                                        <summary>Afficher un indice</summary>
+                                        <p id="hint">Écrivez la suite dans les deux sens et additionnez les termes deux à deux. Quelle somme retrouve-t-on à chaque paire ?</p>
+                                    </details>
+                                    <button class="button" type="submit">Valider mon code</button>
+                                </div>
+                            </div>
+
+                        </fieldset>
+
+                        <div class="tp05-feedback" id="feedback" role="status" aria-atomic="true"></div>
+                        <section class="tp05-panel tp05-results" id="results" aria-labelledby="compare-title" hidden>
+                            <h3 id="compare-title">Comparaison avant et après</h3>
+                            <p id="benchmark"></p>
+                            <table>
+                                <thead><tr><th scope="col">Indicateur</th><th scope="col">Avant</th><th scope="col">Après</th></tr></thead>
+                                <tbody>
+                                    <tr><th scope="row">Opérations comptées</th><td id="before-operations"></td><td id="after-operations"></td></tr>
+                                    <tr><th scope="row">Éléments dans un tableau temporaire</th><td id="before-memory"></td><td>0</td></tr>
+                                </tbody>
+                            </table>
+                            <p id="gain"></p>
+                        </section>
+                    </form>
+                </div>
+            </details>
+
+            <details class="collapsible practical-section tp05-section">
+                <summary><h2>Conclusion : interpréter les résultats <span class="toggle-icon" aria-hidden="true"></span></h2></summary>
+                <div class="tp05-section-body">
+                    <p>Pour chaque exercice terminé, relevez la différence avant et après, puis expliquez quel parcours, calcul ou tableau temporaire votre expression a évité.</p>
+                    <p>Le correcteur évalue un sous-ensemble d’expressions du langage choisi. Il compte les opérations et les éléments temporaires sur les jeux de données de l’exercice. Un chronométrage ou une mesure de RAM demanderait une exécution native.</p>
+                    <p>Le badge <a href="https://www.ecoindex.fr/">EcoIndex</a> estime l’empreinte de la page à partir de la taille du DOM, du nombre de requêtes et du poids transféré.</p>
+                </div>
+            </details>
         </div>
 
-        <noscript><p>Activez JavaScript pour utiliser le correcteur de cet atelier.</p></noscript>
-
-        <form id="atelier" hidden>
-            <div class="tp05-filters">
-                <div>
-                    <label for="language">Langage</label>
-                    <select id="language"></select>
-                </div>
-                <div>
-                    <label for="exercise">Exercice</label>
-                    <select id="exercise"></select>
-                </div>
-                <a id="language-guide" href="../langages.html">Guide du langage</a>
-            </div>
-
-            <div class="tp05-brief">
-                <h2 id="exercise-title"></h2>
-                <p id="exercise-description"></p>
-            </div>
-
-            <div class="tp05-workspace">
-                <div class="tp05-panel">
-                    <h3>Code de départ</h3>
-                    <pre tabindex="0" aria-label="Code de départ"><code id="baseline"></code></pre>
-                    <p id="baseline-note"></p>
-                </div>
-                <div class="tp05-panel">
-                    <h3>Votre optimisation</h3>
-                    <label for="answer">Expression à renvoyer</label>
-                    <textarea id="answer" name="answer" rows="5" maxlength="240" required
-                        spellcheck="false" autocapitalize="off" autocomplete="off"
-                        aria-describedby="inputs syntax"></textarea>
-                    <p id="inputs"></p>
-                    <p id="syntax"></p>
-                    <details>
-                        <summary>Afficher un indice</summary>
-                        <p id="hint"></p>
-                    </details>
-                    <button class="button" type="submit">Valider mon code</button>
-                </div>
-            </div>
-
-            <div class="tp05-feedback" id="feedback" role="status" aria-atomic="true"></div>
-            <section class="tp05-panel tp05-results" id="results" aria-labelledby="compare-title" hidden>
-                <h3 id="compare-title">Comparaison avant et après</h3>
-                <p id="benchmark"></p>
-                <table>
-                    <thead><tr><th scope="col">Indicateur</th><th scope="col">Avant</th><th scope="col">Après</th></tr></thead>
-                    <tbody>
-                        <tr><th scope="row">Opérations comptées</th><td id="before-operations"></td><td id="after-operations"></td></tr>
-                        <tr><th scope="row">Éléments dans un tableau temporaire</th><td id="before-memory"></td><td>0</td></tr>
-                    </tbody>
-                </table>
-                <p id="gain"></p>
-            </section>
-        </form>
-
-        <details class="tp05-method">
-            <summary>Comment sont vérifiés les résultats et l’empreinte de la page ?</summary>
-            <p>Le correcteur évalue un sous-ensemble d’expressions du langage choisi dans votre navigateur. Il compare la réponse au code de départ sur plusieurs jeux de données. La comparaison compte les calculs, les comparaisons, les lectures et les éléments temporaires selon l’exercice. Ces indicateurs décrivent le travail de l’algorithme. Un chronométrage ou une mesure de RAM demanderait une exécution native.</p>
-            <p><a href="https://www.ecoindex.fr/">EcoIndex</a> évalue la page web à partir de la taille du DOM, du nombre de requêtes et du poids transféré. Le badge en bas de page estime le score EcoIndex de cet atelier.</p>
-        </details>
+        <div class="button-container">
+            <a class="button-secondary" href="../en-pratique.html">Découvrir les autres ateliers</a>
+        </div>
     </main>
 
     <footer>

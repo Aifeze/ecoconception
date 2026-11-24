@@ -14,45 +14,47 @@
 }
 
 .tp05 {
-    width: min(72rem, calc(100% - 2rem));
-    max-width: none;
     margin-inline: auto;
-    text-align: left;
-    padding: 0;
-    gap: 1rem;
 }
 
 .tp05 [hidden] {
     display: none;
 }
 
-.tp05-back {
-    display: inline-block;
-    align-self: start;
+.tp05-section {
+    margin-bottom: 1.15rem;
 }
 
-.tp05-intro {
-    padding: clamp(1.25rem, 4vw, 3rem);
-    border: 1px solid #336855;
-    border-radius: 1.2rem;
-    background: radial-gradient(ellipse at top left, #203b33, transparent 75%), #202421;
+.tp05-section > summary {
+    display: block;
+    list-style: none;
+    cursor: pointer;
 }
 
-.tp05-intro h1 {
-    text-align: left;
-    margin: .25rem 0 .75rem;
-    font-size: clamp(1.75rem, 5vw, 3.4rem);
+.tp05-section > summary::-webkit-details-marker {
+    display: none;
 }
 
-.tp05-intro p {
-    max-width: 65ch;
-    margin-bottom: 0;
-}
-
-.tp05-kicker {
+.tp05-section[open] > summary h2 {
     color: var(--highlight-color);
-    font-size: .9rem;
-    font-weight: bold;
+}
+
+.tp05-section .toggle-icon::before {
+    content: '+';
+}
+
+.tp05-section[open] .toggle-icon::before {
+    content: '−';
+}
+
+.tp05-section-body {
+    margin: 10px 0 20px;
+    text-align: left;
+}
+
+.tp05 fieldset {
+    min-width: 0;
+    border: 0;
 }
 
 .tp05-filters {
@@ -103,7 +105,7 @@
     outline-offset: 3px;
 }
 
-.tp05-brief h2 {
+.tp05-brief h3 {
     text-align: left;
     margin-bottom: .5rem;
 }
@@ -114,15 +116,15 @@
     gap: 1rem;
 }
 
-.tp05-panel,
-.tp05-method {
+.tp05-panel {
     padding: clamp(.85rem, 2.5vw, 1.35rem);
     background: #222626;
     border: 1px solid #426154;
     border-radius: .85rem;
 }
 
-.tp05-panel h3 {
+.tp05-panel h3,
+.tp05-panel h4 {
     margin-bottom: .75rem;
 }
 
@@ -134,6 +136,8 @@
 }
 
 .tp05-panel pre code {
+    background: transparent;
+    padding: 0;
     white-space: pre;
 }
 
@@ -141,7 +145,7 @@
     margin-bottom: .65rem;
 }
 
-.tp05 summary {
+.tp05-panel summary {
     cursor: pointer;
     color: var(--highlight-color);
     font-weight: bold;
@@ -184,10 +188,6 @@
 .tp05-results td,
 .tp05-results th:not(:first-child) {
     text-align: right;
-}
-
-.tp05-method {
-    margin: .25rem 0 0;
 }
 
 @media (max-width: 720px) {
