@@ -13,7 +13,6 @@
     <title>Atelier - Génération d'images par IA et écoconception</title>
 
     <link rel="icon" href="../../assets/img/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap" rel="stylesheet">
@@ -54,27 +53,18 @@
         </nav>
     </header>
 
-    <main class="main tp-main ia-main">
+    <main class="main tp-main ia-main ia-steps">
 
         <!-- 1. PRÉSENTATION -->
         <section class="tp-header" aria-labelledby="ia-title">
             <h1 id="ia-title">Générer une image par IA : à quel coût ?</h1>
 
             <div class="tp-summary" aria-label="Informations principales de l'atelier">
-                <div class="tp-summary-item">
-                    <i class="fa-solid fa-clock" aria-hidden="true"></i>
-                    <span>≈ 30 min</span>
-                </div>
+                <div class="tp-summary-item">⏱ ≈ 30 min</div>
                 <span class="tp-summary-separator" aria-hidden="true">•</span>
-                <div class="tp-summary-item">
-                    <i class="fa-solid fa-signal" aria-hidden="true"></i>
-                    <span>Niveau : ⭐ <span class="sr-only">débutant</span></span>
-                </div>
+                <div class="tp-summary-item">Niveau : débutant</div>
                 <span class="tp-summary-separator" aria-hidden="true">•</span>
-                <div class="tp-summary-item">
-                    <i class="fa-solid fa-hand-pointer" aria-hidden="true"></i>
-                    <span>Atelier interactif, sans prérequis</span>
-                </div>
+                <div class="tp-summary-item">Interactif, sans prérequis</div>
             </div>
         </section>
 
@@ -94,16 +84,16 @@
                 est accompagnée de son statut :
             </p>
             <ul class="ia-legend">
-                <li><span class="ia-badge ia-badge--mesure"><i class="fa-solid fa-circle-check" aria-hidden="true"></i>Mesuré</span> obtenu lors d'une expérience</li>
-                <li><span class="ia-badge ia-badge--estime"><i class="fa-solid fa-calculator" aria-hidden="true"></i>Estimation théorique</span> calculé à partir d'une hypothèse</li>
-                <li><span class="ia-badge ia-badge--simule"><i class="fa-solid fa-flask" aria-hidden="true"></i>Valeur simulée</span> fictive, pour illustrer</li>
-                <li><span class="ia-badge ia-badge--non-mesure"><i class="fa-solid fa-circle-question" aria-hidden="true"></i>Donnée non mesurée</span> indisponible</li>
+                <li><span class="ia-badge ia-badge--mesure">Mesuré</span> obtenu lors d'une expérience</li>
+                <li><span class="ia-badge ia-badge--estime">Estimation théorique</span> calculé à partir d'une hypothèse</li>
+                <li><span class="ia-badge ia-badge--simule">Valeur simulée</span> fictive, pour illustrer</li>
+                <li><span class="ia-badge ia-badge--non-mesure">Donnée non mesurée</span> indisponible</li>
             </ul>
         </section>
 
         <!-- 2. COMPRENDRE LA GÉNÉRATION -->
         <section aria-labelledby="ia-s2">
-            <h2 id="ia-s2"><span class="ia-step-number" aria-hidden="true">1</span>Comprendre la génération d'images</h2>
+            <h2 id="ia-s2">Comprendre la génération d'images</h2>
 
             <div class="ia-diffusion">
                 <div>
@@ -146,7 +136,6 @@
 
             <div class="ia-grid-2" style="margin-top: 26px;">
                 <article class="ia-card">
-                    <i class="fa-solid fa-microchip" aria-hidden="true"></i>
                     <h3>Le rôle du GPU</h3>
                     <p>
                         Le processeur graphique (GPU) contient des milliers d'unités de calcul capables de travailler
@@ -156,7 +145,6 @@
                     </p>
                 </article>
                 <article class="ia-card">
-                    <i class="fa-solid fa-bolt" aria-hidden="true"></i>
                     <h3>Pourquoi un coût énergétique ?</h3>
                     <p>
                         Plus il y a de calculs, plus le GPU travaille longtemps ou intensément, et plus il consomme.
@@ -170,12 +158,11 @@
 
         <!-- 3. COMPRENDRE LES PARAMÈTRES -->
         <section aria-labelledby="ia-s3">
-            <h2 id="ia-s3"><span class="ia-step-number" aria-hidden="true">2</span>Comprendre les paramètres</h2>
+            <h2 id="ia-s3">Comprendre les paramètres</h2>
             <p class="ia-lead">Quatre éléments influencent fortement la quantité de calcul nécessaire.</p>
 
             <div class="ia-grid-4">
                 <article class="ia-card">
-                    <i class="fa-solid fa-expand" aria-hidden="true"></i>
                     <h3>Résolution</h3>
                     <p>
                         Les dimensions de l'image. Doubler le côté (512 → 1024 px) multiplie le nombre de pixels
@@ -183,7 +170,6 @@
                     </p>
                 </article>
                 <article class="ia-card">
-                    <i class="fa-solid fa-stairs" aria-hidden="true"></i>
                     <h3>Nombre d'étapes</h3>
                     <p>
                         Le nombre d'itérations de débruitage. Chaque étape ajoute un passage dans le modèle, donc du temps
@@ -192,7 +178,6 @@
                     </p>
                 </article>
                 <article class="ia-card">
-                    <i class="fa-solid fa-microchip" aria-hidden="true"></i>
                     <h3>GPU</h3>
                     <p>
                         Il accélère les calculs. Deux GPU différents ne mettent ni le même temps ni la même puissance
@@ -200,7 +185,6 @@
                     </p>
                 </article>
                 <article class="ia-card">
-                    <i class="fa-solid fa-diagram-project" aria-hidden="true"></i>
                     <h3>Modèle utilisé</h3>
                     <p>
                         Son architecture et ses optimisations modifient les ressources nécessaires. Tous les modèles
@@ -213,7 +197,7 @@
 
         <!-- 4. EXPÉRIMENTER -->
         <section aria-labelledby="ia-s4">
-            <h2 id="ia-s4"><span class="ia-step-number" aria-hidden="true">3</span>Expérimenter les configurations</h2>
+            <h2 id="ia-s4">Expérimenter les configurations</h2>
             <p class="ia-lead">
                 Sélectionnez une configuration pour consulter ses paramètres, son illustration et les données disponibles.
             </p>
@@ -231,7 +215,7 @@
 
         <!-- 5. COMPARER -->
         <section aria-labelledby="ia-s5">
-            <h2 id="ia-s5"><span class="ia-step-number" aria-hidden="true">4</span>Comparer les résultats</h2>
+            <h2 id="ia-s5">Comparer les résultats</h2>
             <p class="ia-lead">
                 Les trois configurations côte à côte. Affichées à la même taille, les images se ressemblent :
                 passez en <strong>vue détail</strong> pour observer une même zone en pixels réels.
@@ -243,6 +227,7 @@
                 <label><input type="radio" name="ia-view" value="detail"><span class="ia-toggle-label">Vue détail (pixels réels)</span></label>
             </fieldset>
 
+            <p class="ia-view-legend" id="ia-view-legend" aria-live="polite">Vue d'ensemble : les trois images sont affichées à la même taille.</p>
             <div class="ia-compare-grid" id="ia-compare-grid"></div>
 
             <div class="ia-table-wrapper" tabindex="0" role="region" aria-labelledby="ia-table-caption">
@@ -256,7 +241,7 @@
                             <th scope="col">Temps de génération</th>
                             <th scope="col">Consommation énergétique</th>
                             <th scope="col">Qualité visuelle</th>
-                            <th scope="col">Volume de calcul relatif</th>
+                            <th scope="col">Volume de calcul relatif (estimation théorique)</th>
                         </tr>
                     </thead>
                     <tbody id="ia-compare-tbody"></tbody>
@@ -276,7 +261,7 @@
 
         <!-- 6. MESURER -->
         <section aria-labelledby="ia-s6">
-            <h2 id="ia-s6"><span class="ia-step-number" aria-hidden="true">5</span>Mesurer plutôt que supposer</h2>
+            <h2 id="ia-s6">Mesurer plutôt que supposer</h2>
 
             <div class="ia-grid-2">
                 <article class="ia-card">
@@ -313,7 +298,7 @@
 
         <!-- 7. COMPROMIS -->
         <section aria-labelledby="ia-s7">
-            <h2 id="ia-s7"><span class="ia-step-number" aria-hidden="true">6</span>Comprendre les compromis</h2>
+            <h2 id="ia-s7">Comprendre les compromis</h2>
 
             <ul class="ia-why">
                 <li>
@@ -346,15 +331,15 @@
 
             <div class="ia-tradeoff">
                 <article class="ia-card">
-                    <h3><i class="fa-solid fa-gauge-high" aria-hidden="true"></i>Performance</h3>
+                    <h3>Performance</h3>
                     <p>Moins de pixels et d'étapes : génération plus rapide, moins de mémoire.</p>
                 </article>
                 <article class="ia-card">
-                    <h3><i class="fa-solid fa-image" aria-hidden="true"></i>Qualité visuelle</h3>
+                    <h3>Qualité visuelle</h3>
                     <p>Elle peut baisser : le bon réglage est celui qui suffit à l'usage prévu.</p>
                 </article>
                 <article class="ia-card">
-                    <h3><i class="fa-solid fa-plug" aria-hidden="true"></i>Consommation</h3>
+                    <h3>Consommation</h3>
                     <p>Elle tend à baisser avec le calcul, mais seule une mesure permet de le confirmer.</p>
                 </article>
             </div>
@@ -362,19 +347,19 @@
 
         <!-- 8. CONCLUSION -->
         <section class="intro-card" aria-labelledby="ia-s8">
-            <h2 id="ia-s8"><span class="ia-step-number" aria-hidden="true">7</span>Conclusion</h2>
+            <h2 id="ia-s8">Conclusion</h2>
             <p class="ia-lead">
                 Générer une image par IA n'est pas gratuit pour l'environnement, mais l'utilisateur dispose de leviers
                 concrets. L'objectif n'est pas la qualité minimale, mais la <strong>qualité suffisante</strong> pour le
                 besoin, obtenue avec le moins de calcul possible.
             </p>
             <ul class="ia-practices">
-                <li><i class="fa-solid fa-check" aria-hidden="true"></i><span><strong>Générer seulement si c'est nécessaire</strong> : une image existante peut parfois suffire.</span></li>
-                <li><i class="fa-solid fa-check" aria-hidden="true"></i><span><strong>Réutiliser</strong> un résultat pertinent plutôt que de relancer une génération.</span></li>
-                <li><i class="fa-solid fa-check" aria-hidden="true"></i><span><strong>Adapter la résolution à l'usage</strong> : une vignette web n'a pas besoin de 1024 × 1024 px.</span></li>
-                <li><i class="fa-solid fa-check" aria-hidden="true"></i><span><strong>Explorer en basse résolution</strong>, puis ne produire en haute définition que l'image retenue.</span></li>
-                <li><i class="fa-solid fa-check" aria-hidden="true"></i><span><strong>Choisir un modèle adapté</strong> : un modèle accéléré peut réduire les ressources, dans certaines conditions.</span></li>
-                <li><i class="fa-solid fa-check" aria-hidden="true"></i><span><strong>Mesurer</strong> avant d'affirmer un gain énergétique.</span></li>
+                <li><strong>Générer seulement si c'est nécessaire</strong> : une image existante peut parfois suffire.</li>
+                <li><strong>Réutiliser</strong> un résultat pertinent plutôt que de relancer une génération.</li>
+                <li><strong>Adapter la résolution à l'usage</strong> : une vignette web n'a pas besoin de 1024 × 1024 px.</li>
+                <li><strong>Explorer en basse résolution</strong>, puis ne produire en haute définition que l'image retenue.</li>
+                <li><strong>Choisir un modèle adapté</strong> : un modèle accéléré peut réduire les ressources, dans certaines conditions.</li>
+                <li><strong>Mesurer</strong> avant d'affirmer un gain énergétique.</li>
             </ul>
             <div class="ia-cta">
                 <a href="../quizIA.html" class="button">Tester vos connaissances (quiz IA)</a>

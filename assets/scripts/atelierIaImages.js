@@ -18,12 +18,12 @@
     const CONFIGS = DATA.configurations;
     const REFERENCE_PIXELS = 512 * 512;
 
-    /* Libellés et icônes de chaque statut : jamais la couleur seule. */
+    /* Libellé de chaque statut (le symbole est ajouté en CSS) : jamais la couleur seule. */
     const STATUTS = {
-        "mesure": { libelle: "Mesuré", icone: "fa-solid fa-circle-check" },
-        "estime": { libelle: "Estimation théorique", icone: "fa-solid fa-calculator" },
-        "simule": { libelle: "Valeur simulée", icone: "fa-solid fa-flask" },
-        "non-mesure": { libelle: "Donnée non mesurée", icone: "fa-solid fa-circle-question" }
+        "mesure": "Mesuré",
+        "estime": "Estimation théorique",
+        "simule": "Valeur simulée",
+        "non-mesure": "Donnée non mesurée"
     };
 
     const nf = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2 });
@@ -37,8 +37,8 @@
     }
 
     function badge(statut) {
-        const s = STATUTS[statut] || STATUTS["non-mesure"];
-        return `<span class="ia-badge ia-badge--${esc(statut)}"><i class="${s.icone}" aria-hidden="true"></i>${esc(s.libelle)}</span>`;
+        const cle = STATUTS[statut] ? statut : "non-mesure";
+        return `<span class="ia-badge ia-badge--${cle}">${STATUTS[cle]}</span>`;
     }
 
     /* Énergie (Wh) = Puissance moyenne (W) × Durée (h). */
@@ -68,7 +68,16 @@
         if (statut === "non-mesure" || valeur === null || valeur === undefined) {
             return badge("non-mesure");
         }
-        return `<strong>${nf.format(valeur)} ${esc(unite)}</strong> ${badge(statut)}`;
+        return `${nf.format(valeur)} ${esc(unite)} ${badge(statut)}`;
+    }
+
+    /* Cellule de tableau : le statut est porté par la cellule elle-même (moins de nœuds DOM). */
+    function cellule(statut, valeur, unite) {
+        if (statut === "non-mesure" || valeur === null || valeur === undefined) {
+            return `<td class="ia-cell ia-cell--non-mesure">${STATUTS["non-mesure"]}</td>`;
+        }
+        const cle = STATUTS[statut] ? statut : "non-mesure";
+        return `<td class="ia-cell ia-cell--${cle}">${nf.format(valeur)} ${esc(unite)} (${STATUTS[cle]})</td>`;
     }
 
     function ligneIndicateurs(config) {
@@ -140,8 +149,7 @@
             <div class="ia-detail-media">
                 <img src="${esc(config.image.apercu)}" alt="${esc(config.image.alt)}"
                      width="512" height="512" decoding="async">
-                <p class="ia-image-label"><i class="fa-solid fa-paintbrush" aria-hidden="true"></i>
-                    Illustration pédagogique, non générée par IA</p>
+                <p class="ia-image-label">Illustration pédagogique, non générée par IA</p>
                 ${lienPleineTaille}
             </div>
             <div class="ia-detail-body">
@@ -150,18 +158,8 @@
                 <p class="ia-detail-summary">${esc(config.resume)}</p>
 
                 <div class="ia-param-cards">
-                    <div class="ia-param-card">
-                        <i class="fa-solid fa-expand" aria-hidden="true"></i>
-                        <span class="ia-param-name">Résolution</span>
-                        <span class="ia-param-value">${esc(l.resolution)}</span>
-                        <span class="ia-param-sub">${esc(l.pixels)}</span>
-                    </div>
-                    <div class="ia-param-card">
-                        <i class="fa-solid fa-stairs" aria-hidden="true"></i>
-                        <span class="ia-param-name">Étapes de débruitage</span>
-                        <span class="ia-param-value">${config.etapes}</span>
-                        <span class="ia-param-sub">passages du modèle</span>
-                    </div>
+                    <p class="ia-param-card">Résolution<strong>${esc(l.resolution)}</strong>${esc(l.pixels)}</p>
+                    <p class="ia-param-card">Étapes de débruitage<strong>${config.etapes}</strong>passages du modèle</p>
                 </div>
 
                 <dl class="ia-measures">
@@ -169,16 +167,13 @@
                     <dt>Consommation énergétique</dt><dd>${l.energie}</dd>
                     <dt>Qualité visuelle (score)</dt><dd>${l.qualite}</dd>
                     <dt>Volume de calcul relatif</dt>
-                    <dd><strong>${esc(l.indiceTexte)}</strong> ${badge("estime")}</dd>
+                    <dd>${esc(l.indiceTexte)} ${badge("estime")}</dd>
                 </dl>
                 ${contexteMesure(config.mesure)}
 
                 <h4>Méthode</h4>
                 <p>${esc(config.methode)}</p>
-                <div class="ia-vigilance" role="note">
-                    <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-                    <p><strong>Point de vigilance :</strong> ${esc(config.vigilance)}</p>
-                </div>
+                <p class="ia-vigilance" role="note"><strong>Point de vigilance :</strong> ${esc(config.vigilance)}</p>
                 <p class="ia-expected"><strong>Qualité attendue :</strong> ${esc(config.qualite.attendu)}</p>
             </div>`;
     }
@@ -193,13 +188,7 @@
         selector.innerHTML = CONFIGS.map((c, i) => `
             <label class="ia-choice">
                 <input type="radio" name="ia-config" value="${esc(c.id)}" ${i === 0 ? "checked" : ""}>
-                <span class="ia-choice-box">
-                    <span class="ia-choice-letter" aria-hidden="true">${esc(c.lettre)}</span>
-                    <span class="ia-choice-text">
-                        <span class="ia-choice-name">${esc(c.nom)}</span>
-                        <span class="ia-choice-params">${c.largeur} × ${c.hauteur} px · ${c.etapes} étapes</span>
-                    </span>
-                </span>
+                <span class="ia-choice-box" data-lettre="${esc(c.lettre)}"><strong>${esc(c.nom)}</strong>${c.largeur} × ${c.hauteur} px · ${c.etapes} étapes</span>
             </label>`).join("");
 
         function afficher(id) {
@@ -220,6 +209,7 @@
         const grid = document.getElementById("ia-compare-grid");
         const tbody = document.getElementById("ia-compare-tbody");
         const toggle = document.getElementById("ia-view-toggle");
+        const legende = document.getElementById("ia-view-legend");
         if (!grid || !tbody) {
             return;
         }
@@ -227,28 +217,14 @@
         grid.innerHTML = CONFIGS.map(c => {
             const l = ligneIndicateurs(c);
             return `
-            <article class="ia-compare-card" aria-labelledby="ia-cmp-${esc(c.id)}">
-                <h3 id="ia-cmp-${esc(c.id)}"><span class="ia-choice-letter" aria-hidden="true">${esc(c.lettre)}</span> ${esc(c.nom)}</h3>
+            <article class="ia-compare-card">
+                <h3>${esc(c.lettre)} · ${esc(c.nom)}</h3>
                 <p class="ia-compare-params">${esc(l.resolution)} · ${c.etapes} étapes</p>
-                <figure class="ia-compare-figure">
-                    <img class="ia-view-whole" src="${esc(c.image.apercu)}" alt="${esc(c.image.alt)}"
-                         width="512" height="512" loading="lazy" decoding="async">
-                    <img class="ia-view-detail" data-src="${esc(c.image.detail)}" alt="${esc(c.image.altDetail)}"
-                         width="${c.image.detailTaille}" height="${c.image.detailTaille}" decoding="async" hidden>
-                    <figcaption class="ia-view-caption">
-                        <span class="ia-view-whole">Vue d'ensemble, affichée à taille égale</span>
-                        <span class="ia-view-detail" hidden>Même zone, ${c.image.detailTaille} × ${c.image.detailTaille} pixels réels agrandis</span>
-                    </figcaption>
-                </figure>
-                <div class="ia-meter" aria-hidden="true">
-                    <span class="ia-meter-label">Volume de calcul relatif (estimation)</span>
-                    <span class="ia-meter-track"><span class="ia-meter-fill" style="width:${Math.max(l.indice, 1.5).toFixed(1)}%"></span></span>
-                    <span class="ia-meter-value">${esc(l.indiceTexte)}</span>
-                </div>
-                <dl class="ia-compare-measures">
-                    <dt>Temps</dt><dd>${l.temps}</dd>
-                    <dt>Énergie</dt><dd>${l.energie}</dd>
-                </dl>
+                <img class="ia-view-whole" src="${esc(c.image.apercu)}" alt="${esc(c.image.alt)}"
+                     width="512" height="512" loading="lazy" decoding="async">
+                <img class="ia-view-detail" data-src="${esc(c.image.detail)}" alt="${esc(c.image.altDetail)}"
+                     width="${c.image.detailTaille}" height="${c.image.detailTaille}" decoding="async" hidden>
+                <p class="ia-meter" style="--ia-part:${Math.max(l.indice, 1.5).toFixed(1)}%">Volume de calcul relatif (estimation) : ${esc(l.indiceTexte)}</p>
             </article>`;
         }).join("");
 
@@ -259,10 +235,10 @@
                 <th scope="row">${esc(c.lettre)} — ${esc(c.nom)}</th>
                 <td>${esc(l.resolution)}</td>
                 <td>${c.etapes}</td>
-                <td>${l.temps}</td>
-                <td>${l.energie}</td>
-                <td>${l.qualite}</td>
-                <td>${esc(l.indiceTexte)} ${badge("estime")}</td>
+                ${cellule(c.mesure.statut, c.mesure.tempsSecondes, "s")}
+                ${cellule(c.mesure.statut, energieWh(c.mesure), "Wh")}
+                ${cellule(c.qualite.statut, c.qualite.valeur, "")}
+                <td class="ia-cell ia-cell--estime">${esc(l.indiceTexte)}</td>
             </tr>`;
         }).join("");
 
@@ -280,6 +256,11 @@
             });
             grid.querySelectorAll(".ia-view-whole").forEach(el => { el.hidden = detail; });
             grid.querySelectorAll(".ia-view-detail").forEach(el => { el.hidden = !detail; });
+            if (legende) {
+                legende.textContent = detail
+                    ? "Vue détail : la même zone de chaque image, en pixels réels agrandis (256 × 256 px pour A, 128 × 128 px pour B et C)."
+                    : "Vue d'ensemble : les trois images sont affichées à la même taille.";
+            }
         });
     }
 
