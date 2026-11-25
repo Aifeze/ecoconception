@@ -10,11 +10,16 @@
     const answer = byId('answer');
     const feedback = byId('feedback');
     const results = byId('results');
-    const drafts = new Map();
+    const solutionButton = byId('reveal-solution');
+    const solutionPanel = byId('solution-panel');
+    const progress = new Map();
     const format = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
     const indentation = '    ';
+    const solutionDelay = 60000;
+    const failedAttemptLimit = 3;
     let currentSelection;
     let leaveEditor = false;
+    let solutionTimer;
 
     function addOptions(select, entries) {
         select.replaceChildren(...entries.map(([value, label]) => new Option(label, value)));
@@ -76,16 +81,22 @@
     }
 
     function showExercise() {
-        if (currentSelection) drafts.set(currentSelection.draftKey, answer.value);
+        if (currentSelection) currentSelection.progress.draft = answer.value;
 
         const languageKey = languageSelect.value;
         const exerciseKey = exerciseSelect.value;
         const language = languages[languageKey];
         const exercise = exercises[exerciseKey];
-        const draftKey = `${languageKey}/${exerciseKey}`;
-        currentSelection = { languageKey, exerciseKey, draftKey };
-        answer.value = drafts.get(draftKey) ?? '';
+        const selectionKey = `${languageKey}/${exerciseKey}`;
+        if (!progress.has(selectionKey)) {
+            progress.set(selectionKey, { draft: '', failedAttempts: 0, availableAt: Date.now() + solutionDelay });
+        }
+        currentSelection = { languageKey, exerciseKey, progress: progress.get(selectionKey) };
+        answer.value = currentSelection.progress.draft;
         resetResults();
+        solutionPanel.hidden = true;
+        solutionButton.setAttribute('aria-expanded', 'false');
+        updateSolutionAvailability();
         form.querySelector('details').open = false;
         byId('exercise-title').textContent = exercise.title;
         byId('exercise-description').textContent = exercise.description;
@@ -106,6 +117,26 @@
         };
         byId('syntax').textContent = syntax[exerciseKey];
     }
+
+    function updateSolutionAvailability() {
+        clearTimeout(solutionTimer);
+        const { failedAttempts, availableAt } = currentSelection.progress;
+        const remaining = availableAt - Date.now();
+        solutionButton.hidden = failedAttempts < failedAttemptLimit && remaining > 0;
+        if (solutionButton.hidden) {
+            solutionTimer = setTimeout(updateSolutionAvailability, remaining);
+        }
+    }
+
+    solutionButton.addEventListener('click', () => {
+        const { languageKey, exerciseKey } = currentSelection;
+        if (solutionPanel.hidden) {
+            byId('solution-code').textContent = exercises[exerciseKey].solution(languageKey);
+            byId('solution-explanation').textContent = exercises[exerciseKey].explanation;
+        }
+        solutionPanel.hidden = !solutionPanel.hidden;
+        solutionButton.setAttribute('aria-expanded', String(!solutionPanel.hidden));
+    });
 
     function restoreDisplayedSelection() {
         languageSelect.value = currentSelection.languageKey;
@@ -157,6 +188,8 @@
             feedback.textContent = `Optimisation validée sur ${exercise.cases.length + 1} jeux de données. La comparaison est affichée sous l’éditeur.`;
         } catch (error) {
             feedback.textContent = `${languages[languageKey].name} — ${error.message}`;
+            currentSelection.progress.failedAttempts++;
+            updateSolutionAvailability();
         }
     });
 

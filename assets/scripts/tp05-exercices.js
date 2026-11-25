@@ -177,6 +177,11 @@ int lire(const int valeurs[], size_t taille, size_t indice) {
             resultType: 'number',
             domain: 'n est un entier de 0 à 20 000.',
             hint: 'Écrivez la suite dans les deux sens et additionnez les termes deux à deux. Quelle somme retrouve-t-on à chaque paire ?',
+            solution: language => {
+                if (language === 'php') return 'intdiv($n * ($n + 1), 2)';
+                return `n * (n + 1) ${languages[language].division} 2`;
+            },
+            explanation: 'En additionnant la suite de 1 à n avec la même suite à l’envers, on obtient n paires de somme n + 1. On divise par deux pour retrouver la somme d’une seule suite.',
             cases: sizes.map(n => ({ n })),
             benchmark: { n: 10000 },
             reference: sumReference,
@@ -190,6 +195,12 @@ int lire(const int valeurs[], size_t taille, size_t indice) {
             resultType: 'boolean',
             domain: 'n est un entier de 0 à 20 000. La cible peut être négative ou hors de la suite.',
             hint: 'Il n’y a aucun trou entre 1 et n. Deux comparaisons de bornes suffisent.',
+            solution: language => {
+                if (language === 'python') return '1 <= cible <= n';
+                if (language === 'php') return '$cible >= 1 && $cible <= $n';
+                return 'cible >= 1 && cible <= n';
+            },
+            explanation: 'La suite contient exactement les entiers compris entre 1 et n. Vérifier les deux bornes suffit, y compris lorsque n vaut 0.',
             cases: sizes.flatMap(n => [-7, 0, 1, Math.ceil(n / 2), n, n + 1].map(cible => ({ n, cible }))),
             benchmark: { n: 10000, cible: 10001 },
             reference: containsReference,
@@ -203,6 +214,8 @@ int lire(const int valeurs[], size_t taille, size_t indice) {
             resultType: 'number',
             domain: 'Le tableau contient des entiers. Le premier indice vaut 0 et l’indice demandé existe toujours.',
             hint: 'L’accès à un élément par son indice laisse le tableau intact. Vous pouvez lire l’élément directement dans le tableau d’origine.',
+            solution: language => language === 'php' ? '$valeurs[$indice]' : 'valeurs[indice]',
+            explanation: 'Lisez l’élément à l’indice demandé directement dans le tableau d’origine. Une seule lecture suffit et aucun tableau temporaire n’est nécessaire.',
             cases: [
                 { valeurs: [0], indice: 0 },
                 { valeurs: [-8, 5, 5, 11], indice: 0 },

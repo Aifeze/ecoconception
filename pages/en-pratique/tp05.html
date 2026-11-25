@@ -11,9 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/styles/styles.css?v=tp05">
     <script defer src="../../assets/scripts/hamburger.js"></script>
-    <script defer src="../../assets/scripts/tp05-exercices.js?v=2"></script>
+    <script defer src="../../assets/scripts/tp05-exercices.js?v=3"></script>
     <script defer src="../../assets/scripts/tp05-expression.js?v=3"></script>
-    <script defer src="../../assets/scripts/tp05.js?v=5"></script>
+    <script defer src="../../assets/scripts/tp05.js?v=6"></script>
 </head>
 <body class="tp05-page">
     <header>
@@ -112,6 +112,13 @@
                                         <p id="hint">Écrivez la suite dans les deux sens et additionnez les termes deux à deux. Quelle somme retrouve-t-on à chaque paire ?</p>
                                     </details>
                                     <button class="button" type="submit">Valider mon code</button>
+                                    <button class="button-secondary" id="reveal-solution" type="button"
+                                        aria-controls="solution-panel" aria-expanded="false" hidden>Sauve moi !</button>
+                                    <div class="tp-note" id="solution-panel" hidden>
+                                        <h5>Solution proposée</h5>
+                                        <pre tabindex="0"><code id="solution-code"></code></pre>
+                                        <p id="solution-explanation"></p>
+                                    </div>
                                 </div>
                             </div>
 
