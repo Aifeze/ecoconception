@@ -26,7 +26,7 @@
         "non-mesure": "Donnée non mesurée"
     };
 
-    const nf = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2 });
+    const nf = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 3 });
 
     function esc(text) {
         return String(text)
@@ -64,11 +64,12 @@
         return (brut / indiceMax) * 100;
     }
 
-    function valeurMesure(statut, valeur, unite) {
+    function valeurMesure(statut, valeur, unite, ecart) {
         if (statut === "non-mesure" || valeur === null || valeur === undefined) {
             return badge("non-mesure");
         }
-        return `${nf.format(valeur)} ${esc(unite)} ${badge(statut)}`;
+        const plusMoins = typeof ecart === "number" ? ` ± ${nf.format(ecart)}` : "";
+        return `${nf.format(valeur)}${plusMoins} ${esc(unite)} ${badge(statut)}`;
     }
 
     /* Cellule de tableau : le statut est porté par la cellule elle-même (moins de nœuds DOM). */
@@ -88,29 +89,21 @@
             resolution: `${config.largeur} × ${config.hauteur} px`,
             pixels: `${nf.format(config.largeur * config.hauteur / 1e6)} million${config.largeur * config.hauteur >= 2e6 ? "s" : ""} de pixels`,
             etapes: `${config.etapes} étapes`,
-            temps: valeurMesure(m.statut, m.tempsSecondes, "s"),
-            energie: valeurMesure(m.statut, e, "Wh"),
+            temps: valeurMesure(m.statut, m.tempsSecondes, "s", m.tempsEcartType),
+            energie: valeurMesure(m.statut, e, "Wh", m.energieEcartType),
+            energieValeur: m.statut === "mesure" ? e : null,
             qualite: valeurMesure(config.qualite.statut, config.qualite.valeur, ""),
             indice: indice,
             indiceTexte: `${nf.format(Math.round(indice * 10) / 10)} / 100`
         };
     }
 
-    function contexteMesure(m) {
-        if (m.statut === "non-mesure") {
+    /* Ligne « puissance moyenne » du détail, seulement si elle a été mesurée. */
+    function lignePuissance(m) {
+        if (m.statut !== "mesure" || typeof m.puissanceMoyenneW !== "number") {
             return "";
         }
-        const items = [
-            ["Matériel", m.materiel],
-            ["Modèle", m.modele],
-            ["Puissance moyenne", typeof m.puissanceMoyenneW === "number" ? `${nf.format(m.puissanceMoyenneW)} W` : null],
-            ["Date", m.date],
-            ["Protocole", m.protocole]
-        ].filter(item => item[1]);
-        if (!items.length) {
-            return "";
-        }
-        return `<dl class="ia-context">${items.map(i => `<dt>${esc(i[0])}</dt><dd>${esc(i[1])}</dd>`).join("")}</dl>`;
+        return `<dt>Puissance moyenne de la carte</dt><dd>${nf.format(m.puissanceMoyenneW)} W ${badge("mesure")}</dd>`;
     }
 
     /* ── 1. Schéma du débruitage ───────────────────────────────────────── */
@@ -142,14 +135,14 @@
         const l = ligneIndicateurs(config);
         const lienPleineTaille = config.image.pleineTaille
             ? `<a class="ia-fullsize-link" href="${esc(config.image.pleineTaille)}" target="_blank" rel="noopener">
-                   Ouvrir l'illustration en ${config.largeur} × ${config.hauteur} px (32 Ko)
+                   Ouvrir l'image en ${config.largeur} × ${config.hauteur} px (${config.image.pleineTailleKo || "?"} Ko)
                    <span class="sr-only">(nouvel onglet)</span></a>`
             : "";
         return `
             <div class="ia-detail-media">
                 <img src="${esc(config.image.apercu)}" alt="${esc(config.image.alt)}"
                      width="512" height="512" decoding="async">
-                <p class="ia-image-label">Illustration pédagogique, non générée par IA</p>
+                <p class="ia-image-label">Image réellement générée lors de la mesure (essai n° 1)</p>
                 ${lienPleineTaille}
             </div>
             <div class="ia-detail-body">
@@ -165,16 +158,16 @@
                 <dl class="ia-measures">
                     <dt>Temps de génération</dt><dd>${l.temps}</dd>
                     <dt>Consommation énergétique</dt><dd>${l.energie}</dd>
+                    ${lignePuissance(config.mesure)}
                     <dt>Qualité visuelle (score)</dt><dd>${l.qualite}</dd>
                     <dt>Volume de calcul relatif</dt>
                     <dd>${esc(l.indiceTexte)} ${badge("estime")}</dd>
                 </dl>
-                ${contexteMesure(config.mesure)}
 
                 <h4>Méthode</h4>
                 <p>${esc(config.methode)}</p>
                 <p class="ia-vigilance" role="note"><strong>Point de vigilance :</strong> ${esc(config.vigilance)}</p>
-                <p class="ia-expected"><strong>Qualité attendue :</strong> ${esc(config.qualite.attendu)}</p>
+                <p class="ia-expected"><strong>Qualité observée :</strong> ${esc(config.qualite.attendu)}</p>
             </div>`;
     }
 
@@ -214,8 +207,14 @@
             return;
         }
 
+        const energiesMesurees = CONFIGS.map(c => ligneIndicateurs(c).energieValeur).filter(v => typeof v === "number");
+        const energieMax = energiesMesurees.length ? Math.max.apply(null, energiesMesurees) : null;
+
         grid.innerHTML = CONFIGS.map(c => {
             const l = ligneIndicateurs(c);
+            const barreEnergie = energieMax && typeof l.energieValeur === "number"
+                ? `<p class="ia-meter ia-meter--mesure" style="--ia-part:${Math.max(l.energieValeur / energieMax * 100, 1.5).toFixed(1)}%">Énergie mesurée : ${nf.format(l.energieValeur)} Wh par image</p>`
+                : "";
             return `
             <article class="ia-compare-card">
                 <h3>${esc(c.lettre)} · ${esc(c.nom)}</h3>
@@ -225,6 +224,7 @@
                 <img class="ia-view-detail" data-src="${esc(c.image.detail)}" alt="${esc(c.image.altDetail)}"
                      width="${c.image.detailTaille}" height="${c.image.detailTaille}" decoding="async" hidden>
                 <p class="ia-meter" style="--ia-part:${Math.max(l.indice, 1.5).toFixed(1)}%">Volume de calcul relatif (estimation) : ${esc(l.indiceTexte)}</p>
+                ${barreEnergie}
             </article>`;
         }).join("");
 
@@ -258,7 +258,7 @@
             grid.querySelectorAll(".ia-view-detail").forEach(el => { el.hidden = !detail; });
             if (legende) {
                 legende.textContent = detail
-                    ? "Vue détail : la même zone de chaque image, en pixels réels agrandis (256 × 256 px pour A, 128 × 128 px pour B et C)."
+                    ? "Vue détail : la même zone relative de chaque image (un quart de sa largeur), en pixels réels agrandis : 256 × 256 px pour A, 128 × 128 px pour B et C."
                     : "Vue d'ensemble : les trois images sont affichées à la même taille.";
             }
         });
@@ -301,10 +301,35 @@
         maj();
     }
 
+    /* ── 5. Ce que disent les mesures (texte calculé à partir des données) ── */
+    function initLecon() {
+        const lecon = document.getElementById("ia-lecon-mesure");
+        const contexte = document.getElementById("ia-mesure-contexte");
+        const ctx = DATA.contexteMesures;
+        if (contexte && ctx) {
+            contexte.textContent =
+                `Mesures réalisées le ${ctx.date} sur ${ctx.materiel} (${ctx.logiciel}). ${ctx.protocole} ` +
+                `Au repos, la carte consomme déjà environ ${nf.format(ctx.puissanceReposW)} W. ` +
+                "Ces valeurs sont propres à cette machine : ce sont surtout les écarts entre configurations qui comptent.";
+        }
+        const a = CONFIGS[0].mesure;
+        const b = CONFIGS[1].mesure;
+        if (!lecon || a.statut !== "mesure" || b.statut !== "mesure") {
+            return;
+        }
+        const un = v => nf.format(Math.round(v * 10) / 10);
+        lecon.textContent =
+            `Mesuré sur notre machine : la configuration A prend ${un(a.tempsSecondes / b.tempsSecondes)} fois plus de temps que B, ` +
+            `mais consomme ${un(energieWh(a) / energieWh(b))} fois plus d'énergie. ` +
+            `La carte y travaille en effet à pleine charge (${nf.format(Math.round(a.puissanceMoyenneW))} W en moyenne contre ` +
+            `${nf.format(Math.round(b.puissanceMoyenneW))} W) : se fier au seul temps aurait fortement sous-estimé l'écart.`;
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
         initDebruitage();
         initSelection();
         initComparaison();
         initCalculateur();
+        initLecon();
     });
 })();

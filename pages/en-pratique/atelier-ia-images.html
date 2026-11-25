@@ -79,9 +79,9 @@
 
             <h2 class="sr-only">Comment lire les données de cet atelier</h2>
             <p class="ia-lead">
-                <strong>Transparence :</strong> cet atelier n'effectue aucune génération réelle et n'invente aucune mesure.
-                Les images sont des <strong>illustrations pédagogiques</strong> dessinées par un script, et chaque valeur
-                est accompagnée de son statut :
+                <strong>Transparence :</strong> les trois images comparées et leurs mesures proviennent de
+                <strong>vraies générations</strong>, réalisées en amont sur une carte graphique (votre navigateur n'en
+                lance aucune). Le schéma du débruitage est une illustration. Chaque valeur est accompagnée de son statut :
             </p>
             <ul class="ia-legend">
                 <li><span class="ia-badge ia-badge--mesure">Mesuré</span> obtenu lors d'une expérience</li>
@@ -217,8 +217,9 @@
         <section aria-labelledby="ia-s5">
             <h2 id="ia-s5">Comparer les résultats</h2>
             <p class="ia-lead">
-                Les trois configurations côte à côte. Affichées à la même taille, les images se ressemblent :
-                passez en <strong>vue détail</strong> pour observer une même zone en pixels réels.
+                Les trois configurations côte à côte, avec la même demande (prompt) et la même graine aléatoire.
+                Notez que changer la résolution change aussi la composition. Passez en <strong>vue détail</strong>
+                pour observer la finesse des pixels.
             </p>
 
             <fieldset class="ia-toggle" id="ia-view-toggle">
@@ -255,8 +256,10 @@
                 opérations (l'attention) croissent plus vite que le nombre de pixels, d'autres coûts restent fixes
                 (chargement du modèle, lecture du prompt, décodage final de l'image), et un modèle accéléré peut avoir
                 un coût par étape différent. Surtout, ce volume ne dit rien de la puissance réellement appelée par le
-                matériel : il ne remplace pas une mesure d'énergie.
+                matériel : il ne remplace pas une mesure d'énergie. Ici, l'estimation (100 / 12,5 / 4,2) donne le bon
+                ordre de grandeur, mais l'énergie mesurée chute encore plus vite (100 / 10 / 3,8).
             </p>
+            <p class="ia-note" id="ia-mesure-contexte"></p>
         </section>
 
         <!-- 6. MESURER -->
@@ -282,10 +285,10 @@
                     <p>Saisissez des valeurs (par exemple issues de vos propres relevés) pour obtenir l'énergie.</p>
                     <form class="ia-calc" id="ia-calc" novalidate>
                         <label for="ia-calc-power">Puissance moyenne (W)
-                            <input id="ia-calc-power" name="ia-calc-power" type="number" min="0" step="any" inputmode="decimal" placeholder="ex. 250">
+                            <input id="ia-calc-power" name="ia-calc-power" type="number" min="0" step="any" inputmode="decimal" placeholder="ex. 271">
                         </label>
                         <label for="ia-calc-duration">Durée par image (s)
-                            <input id="ia-calc-duration" name="ia-calc-duration" type="number" min="0" step="any" inputmode="decimal" placeholder="ex. 6">
+                            <input id="ia-calc-duration" name="ia-calc-duration" type="number" min="0" step="any" inputmode="decimal" placeholder="ex. 10,4">
                         </label>
                         <label for="ia-calc-count">Nombre d'images
                             <input id="ia-calc-count" name="ia-calc-count" type="number" min="1" step="1" inputmode="numeric" value="1">
@@ -294,6 +297,7 @@
                     <output class="ia-calc-output" id="ia-calc-result" for="ia-calc-power ia-calc-duration ia-calc-count" aria-live="polite"></output>
                 </article>
             </div>
+            <p class="ia-vigilance" id="ia-lecon-mesure" role="note"></p>
         </section>
 
         <!-- 7. COMPROMIS -->

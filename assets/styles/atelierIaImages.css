@@ -608,8 +608,14 @@
     margin-top: 6px;
     border-radius: 999px;
     background:
-        linear-gradient(#8fb0ff, #8fb0ff) left / var(--ia-part, 0%) 100% no-repeat,
+        linear-gradient(var(--ia-couleur, #8fb0ff), var(--ia-couleur, #8fb0ff)) left / var(--ia-part, 0%) 100% no-repeat,
         rgba(255, 255, 255, 0.1);
+}
+
+/* Énergie mesurée : barre verte, pour la distinguer de l'estimation (bleue) */
+.ia-meter--mesure {
+    --ia-couleur: var(--success-color);
+    color: var(--text-color);
 }
 
 .ia-view-legend {

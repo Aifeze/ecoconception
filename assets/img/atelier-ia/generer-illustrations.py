@@ -1,14 +1,13 @@
 """
-Génère les illustrations pédagogiques de l'atelier « Génération d'images par IA ».
+Génère le schéma « du bruit à l'image » de l'atelier « Génération d'images par IA »
+(fichiers debruitage-0.webp à debruitage-5.webp).
 
 IMPORTANT : ces images NE SONT PAS produites par un modèle d'IA.
-Elles sont dessinées par ce script (paysage procédural) afin de figurer,
-de manière honnête et reproductible, les différences attendues entre :
-  - une image de 1024 × 1024 px (configuration A) ;
-  - une image de 512 × 512 px (configurations B et C) ;
-  - une image « peu d'étapes » (C) : détails fins atténués, typiques des
-    compromis possibles avec certains modèles accélérés.
-Ainsi qu'une suite d'images montrant le principe du débruitage progressif.
+Elles sont dessinées par ce script (paysage procédural + bruit) pour illustrer
+le principe du débruitage progressif.
+
+Les images des configurations A, B et C (config-*.webp, detail-*.webp) sont, elles,
+de vraies générations réalisées lors de la mesure : voir outils/mesure-ia/.
 
 Utilisation (depuis la racine du dépôt) :
     python assets/img/atelier-ia/generer-illustrations.py
@@ -116,28 +115,10 @@ def save(img, name, quality=72):
 
 
 def main():
-    full = render_scene(SIZE)  # « Configuration A » : 1024 × 1024
-    b = full.resize((512, 512), Image.LANCZOS)  # « Configuration B » : 512 × 512
-
-    # « Configuration C » : 512 × 512, détails fins atténués + légère dérive des couleurs
-    c = b.filter(ImageFilter.GaussianBlur(1.3))
-    c_arr = np.asarray(c).astype(np.float32) / 255
-    c_arr = np.clip((c_arr - 0.5) * 1.08 + 0.5 + np.array([0.015, 0.0, -0.01]), 0, 1)
-    c = Image.fromarray((c_arr * 255).astype(np.uint8))
-
-    # Vues d'ensemble affichées à taille égale (512 px suffisent pour l'affichage)
-    save(full.resize((512, 512), Image.LANCZOS), "config-a-apercu.webp")
-    save(b, "config-b-apercu.webp")
-    save(c, "config-c-apercu.webp")
-    # Fichier pleine résolution, chargé uniquement si l'utilisateur l'ouvre
-    save(full, "config-a-1024.webp", quality=70)
-
-    # Recadrages « pixels réels » d'une même zone (herbes + rive du lac)
-    box_512 = (300, 384, 428, 512)  # 128 × 128 dans l'image 512
-    box_1024 = tuple(v * 2 for v in box_512)  # même zone, 256 × 256 dans l'image 1024
-    save(full.crop(box_1024), "detail-a.webp", quality=80)
-    save(b.crop(box_512), "detail-b.webp", quality=80)
-    save(c.crop(box_512), "detail-c.webp", quality=80)
+    # Les images des configurations A, B et C sont désormais de vraies générations,
+    # produites lors de la mesure (voir outils/mesure-ia/). Ce script ne produit
+    # plus que le schéma du débruitage, afin de ne pas les écraser.
+    full = render_scene(SIZE)
 
     # Principe du débruitage : du bruit pur vers l'image (schéma, 6 états)
     small = np.asarray(full.resize((256, 256), Image.LANCZOS)).astype(np.float32) / 255
