@@ -12,7 +12,9 @@
     const results = byId('results');
     const drafts = new Map();
     const format = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
+    const indentation = '    ';
     let currentSelection;
+    let leaveEditor = false;
 
     function addOptions(select, entries) {
         select.replaceChildren(...entries.map(([value, label]) => new Option(label, value)));
@@ -25,6 +27,52 @@
         feedback.textContent = '';
         delete feedback.dataset.success;
         results.hidden = true;
+    }
+
+    function replaceAnswerRange(text, from, to, selectionStart, selectionEnd) {
+        if (answer.value.length - (to - from) + text.length > answer.maxLength) return;
+        const direction = answer.selectionDirection;
+        answer.setSelectionRange(from, to);
+        // Preserve the browser's undo history where text insertion is supported.
+        if (!document.execCommand('insertText', false, text)) {
+            answer.setRangeText(text, from, to);
+        }
+        answer.setSelectionRange(selectionStart, selectionEnd, direction);
+        resetResults();
+    }
+
+    function changeIndentation(outdent) {
+        const { value, selectionStart, selectionEnd } = answer;
+        const hasSelection = selectionStart !== selectionEnd;
+        if (!outdent && !hasSelection) {
+            const caret = selectionStart + indentation.length;
+            replaceAnswerRange(indentation, selectionStart, selectionEnd, caret, caret);
+            return;
+        }
+
+        const firstLineStart = value.slice(0, selectionStart).lastIndexOf('\n') + 1;
+        const lastSelected = hasSelection ? selectionEnd - 1 : selectionEnd;
+        const nextBreak = value.indexOf('\n', lastSelected);
+        const lastLineEnd = nextBreak === -1 ? value.length : nextBreak;
+        const lines = value.slice(firstLineStart, lastLineEnd).split('\n');
+        let lineStart = firstLineStart;
+        let newStart = selectionStart;
+        let newEnd = selectionEnd;
+
+        const edited = lines.map(line => {
+            const prefix = outdent ? line.match(/^(?:\t| {1,4})/)?.[0] ?? '' : '';
+            const shiftAt = position => outdent
+                ? -Math.min(prefix.length, Math.max(0, position - lineStart))
+                : indentation.length;
+            if (lineStart === firstLineStart) newStart += shiftAt(selectionStart);
+            newEnd += shiftAt(selectionEnd);
+            lineStart += line.length + 1;
+            return outdent ? line.slice(prefix.length) : indentation + line;
+        }).join('\n');
+
+        if (edited !== value.slice(firstLineStart, lastLineEnd)) {
+            replaceAnswerRange(edited, firstLineStart, lastLineEnd, newStart, newEnd);
+        }
     }
 
     function showExercise() {
@@ -115,6 +163,20 @@
     languageSelect.addEventListener('change', showExercise);
     exerciseSelect.addEventListener('change', showExercise);
     answer.addEventListener('input', resetResults);
+    answer.addEventListener('blur', () => { leaveEditor = false; });
+    answer.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+            leaveEditor = true;
+        } else if (event.key === 'Tab' && !event.ctrlKey && !event.altKey && !event.metaKey && !event.isComposing) {
+            if (!leaveEditor) {
+                event.preventDefault();
+                changeIndentation(event.shiftKey);
+            }
+            leaveEditor = false;
+        } else if (event.key !== 'Shift') {
+            leaveEditor = false;
+        }
+    });
     showExercise();
     window.addEventListener('pageshow', restoreDisplayedSelection);
     byId('atelier-controls').disabled = false;
