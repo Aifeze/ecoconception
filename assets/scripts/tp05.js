@@ -104,7 +104,7 @@
             contains: `Pour combiner deux comparaisons, utilisez ${booleanAnd}.`,
             read: `Pour lire un élément, utilisez les crochets : ${names[0]}[…].`,
         };
-        byId('syntax').textContent = `${syntax[exerciseKey]} Saisissez l’expression seule, sans fonction ni point-virgule.`;
+        byId('syntax').textContent = syntax[exerciseKey];
     }
 
     function restoreDisplayedSelection() {

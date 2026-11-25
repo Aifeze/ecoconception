@@ -12,8 +12,8 @@
     <link rel="stylesheet" href="../../assets/styles/styles.css?v=tp05">
     <script defer src="../../assets/scripts/hamburger.js"></script>
     <script defer src="../../assets/scripts/tp05-exercices.js?v=2"></script>
-    <script defer src="../../assets/scripts/tp05-expression.js?v=2"></script>
-    <script defer src="../../assets/scripts/tp05.js?v=4"></script>
+    <script defer src="../../assets/scripts/tp05-expression.js?v=3"></script>
+    <script defer src="../../assets/scripts/tp05.js?v=5"></script>
 </head>
 <body class="tp05-page">
     <header>
@@ -100,12 +100,13 @@
                                 <div class="info-block">
                                     <h4>Votre optimisation</h4>
                                     <label for="answer">Expression à renvoyer</label>
+                                    <p id="answer-format">Saisissez uniquement l’expression que la fonction doit renvoyer.</p>
                                     <textarea id="answer" name="answer" rows="5" maxlength="240" required
                                         spellcheck="false" autocapitalize="off" autocomplete="off"
-                                        aria-describedby="inputs syntax editor-keys"></textarea>
+                                        aria-describedby="answer-format inputs syntax editor-keys"></textarea>
                                     <p id="editor-keys">Tab pour indenter, Maj + Tab pour désindenter. Échap puis Tab pour quitter le champ.</p>
                                     <p id="inputs">Variable : n, un entier de 0 à 20 000.</p>
-                                    <p id="syntax">Saisissez l’expression seule, sans fonction ni point-virgule.</p>
+                                    <p id="syntax">Opérateur de division pour cet exercice : /.</p>
                                     <details>
                                         <summary>Afficher un indice</summary>
                                         <p id="hint">Écrivez la suite dans les deux sens et additionnez les termes deux à deux. Quelle somme retrouve-t-on à chaque paire ?</p>

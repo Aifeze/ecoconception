@@ -7,17 +7,31 @@ const tp05Evaluator = (() => {
     };
     const comparisons = new Set(['==', '!=', '<', '>', '<=', '>=']);
     const operatorPattern = /\s+|\$?[A-Za-z_][A-Za-z_0-9]*|(?:0|[1-9][0-9]*)|===|!==|==|!=|<=|>=|&&|\|\||\/\/|~\/|--|[+*/%<>!()[\],-]/gy;
+    const functionDeclaration = /^(?:(?:async\s+)?(?:def|fn|function)\b|(?:(?:public|private|static)\s+)*(?:int|bool|boolean|long|double|num|void)\s+\w+\s*\()/;
 
     function tokenize(source, language) {
-        if (!source.trim() || source.length > 240) {
+        const expression = source.trimStart();
+        if (!expression || source.length > 240) {
             throw new Error('Écrivez une expression de 1 à 240 caractères.');
+        }
+        if (functionDeclaration.test(expression)) {
+            throw new Error('Vous avez saisi une définition de fonction. Dans ce champ, écrivez seulement l’expression qui doit être renvoyée.');
+        }
+        if (/^return\b/.test(expression)) {
+            throw new Error('Écrivez seulement l’expression qui suit « return ».');
+        }
+        if (/^(?:if|for|while)\b/.test(expression)) {
+            throw new Error('Vous avez saisi une instruction. Ce champ attend une expression, par exemple un calcul ou une comparaison.');
         }
         const tokens = [];
         operatorPattern.lastIndex = 0;
         let offset = 0;
         while (offset < source.length) {
             const token = operatorPattern.exec(source)?.[0];
-            if (!token) throw new Error(`Caractère non pris en charge à la position ${offset + 1}.`);
+            if (!token) {
+                const character = String.fromCodePoint(source.codePointAt(offset));
+                throw new Error(`Caractère non pris en charge « ${character} » à la position ${offset + 1} de l’expression.`);
+            }
             if (token.trim()) {
                 const python = language === 'python';
                 const supported = {
