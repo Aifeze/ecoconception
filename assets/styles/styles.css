@@ -1012,6 +1012,9 @@ label {
 .app-chatgpt {
     --app-color: #2fdfad;
 }
+.app-claude {
+    --app-color: #d97757;
+}
 .app-facebook {
     --app-color: #1877f2;
 }
@@ -1362,6 +1365,9 @@ body:has(img[src*="Steam" i]) {
 }
 body:has(img[src*="ChatGPT" i]) {
     --service-color: #2fdfad;
+}
+body:has(img[src*="Anthropic" i]) {
+    --service-color: #d97757;
 }
 body:has(img[src*="Google" i]) {
     --service-color: #34a853;
